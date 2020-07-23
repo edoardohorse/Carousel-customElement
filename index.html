@@ -1,44 +1,16 @@
 <html>
     <head>
         <meta charset="utf8">
-        <link rel="stylesheet" href="slider.css">
     </head>
     <body>
 
-        <labycar-carousel header-position='top' title='Intestazione'> <!-- Default top -->
-            <header></header>
-            <main class="wrapper">
-                <div data-image-src="./img/1.jpg" ></div>
-                <div data-image-src="./img/2.jpg" ></div>
-                <div data-image-src="./img/3.jpg" ></div>
-            </main>
-            <footer></footer>
+        <labycar-carousel>
+                <div data-src="./img/1.jpg"></div>
+                <div data-src="./img/2.jpg"></div>
+                <div data-src="./img/3.jpg"></div>
         </labycar-carousel>
-    
-        <labycar-carousel header='bottom'>
-            <header><h1>Intestazione</h1></header>
-            <main class="wrapper">
-                <div data-image-src="./img/1.jpg" ></div>
-                <div data-image-src="./img/2.jpg" ></div>
-                <div data-image-src="./img/3.jpg" ></div>
-            </main>
-            <footer></footer>
-        </labycar-carousel>
-        
-        
-        <labycar-carousel header='above'>
-            <header><h1>Intestazione</h1></header>
-            <main class="wrapper">
-                <div data-image-src="./img/1.jpg" ></div>
-                <div data-image-src="./img/2.jpg" ></div>
-                <div data-image-src="./img/3.jpg" ></div>
-            </main>
-            <footer></footer>
-        </labycar-carousel>
-        
     </body>
-    <script src="slider.js" ></script>
-    <script>
-        const c = new Carousel(document.querySelector('labycar-carousel'))
-    </script>
+
+    <script src="slider.js" defer></script>
+    
 </html>

@@ -1,48 +1,17 @@
-class Carousel{
+class Carousel extends HTMLElement{
+
+    static get observedAttributes(){
+        return ['title', 'subtitle', 'header-position', 'header-above']
+    }
+
     get index(){return this._index+1}
     get nImg(){return this._nImg}
     get lastIndex(){ return this._nImg-1}
 
-    get title(){return this.root.getAttribute('title')}
-    set title(v){
-        this.root.setAttribute('title', v);
-        this.root.titleEl.textContent = v
-    }
-
-    static HEADER_POSITION = ['top','bottom'] 
-
-    get headerPosition(){
-        if(this.root.hasAttribute('header-position'))
-            return this.root.getAttribute('header-position')
-        
-        // Default
-        return 'top'
-    }
-
-    set headerPosition(v){
-        if(v in HEADER_POSITION){
-            return this.root.setAttribute('header-position', v)
-        }
-        return console.error('Valore %c non inesistente. Usare %c', v, HEADER_POSITION)
-    }
-
-    get headerAbove(){
-        if(this.root.hasAttribute('header-above')){
-            return this.root.getAttribute('header-above')
-        }
-    }
-
-    set headerAbove(v){
-        if(v in [true,false]){
-            this.root.setAttribute('header-above', v)
-        }
-
-    }
-
     set index(index){
         index = index-1
         if(index < 0 && index >= this._nImg){
-            return console.log('Indice non valido')
+            return console.debug('Indice non valido')
         }
 
         this._index = index
@@ -50,19 +19,27 @@ class Carousel{
     }
 
     constructor(el){
+        super()
 
         //#region Root
-        this.root           = el
-        this.root.header    = el.querySelector('header')
-        this.root.wrapper   = el.querySelector('main')
-        this.root.footer    = el.querySelector('footer')
+        this.root           = this.attachShadow({mode: 'open'})
+        this.root.header    = document.createElement('header')
+        this.root.wrapper   = document.createElement('main')
+        this.root.footer    = document.createElement('footer')
+        this.root.style     = document.createElement('link')
+
+        //style
+        this.root.style.setAttribute('rel','stylesheet')
+        this.root.style.setAttribute('href','slider.css')
+
+        this.root.appendChild(this.root.style)
 
         // header
-        this.root.titleEl = document.createElement('p')
-        this.root.titleEl.textContent = this.root.getAttribute('title')
+        this.root.titleEl = document.createElement('span')
+        this.root.titleEl.textContent = this.getAttribute('title')
         
-        this.root.subtitleEl = document.createElement('p')
-        this.root.subtitleEl.textContent = this.root.getAttribute('subtitle')
+        this.root.subtitleEl = document.createElement('span')
+        this.root.subtitleEl.textContent = this.getAttribute('subtitle')
 
         this.root.header.appendChild(this.root.titleEl)
         this.root.header.appendChild(this.root.subtitleEl)
@@ -76,6 +53,19 @@ class Carousel{
         this.root.footer.appendChild(this.root.btnPrev)
         this.root.footer.appendChild(this.root.btnNext)
 
+        //images
+        this.querySelectorAll('div').forEach(div=>{
+
+            this.removeChild(div)
+            this.root.wrapper.appendChild(div)
+            div.style.backgroundImage= `url(${div.dataset.src})`
+
+        })
+
+        this.root.appendChild(this.root.header)
+        this.root.appendChild(this.root.wrapper)
+        this.root.appendChild(this.root.footer)
+
         //#endregion
 
         //#region Fields         
@@ -88,6 +78,25 @@ class Carousel{
         //#endregion
         
         this.addEventListener()
+    }
+
+    connectedCallback(){
+
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        switch(name){
+            case 'title':{
+                this.root.titleEl.textContent = newValue
+                break
+            }
+            
+            case 'subtitle':{
+                this.root.subtitleEl.textContent = newValue
+                break
+            }
+
+        }
     }
 
     //#region Private
@@ -106,7 +115,7 @@ class Carousel{
     }
       
     updateTranslate(){
-        this.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
+        this.root.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
     }
 
     //#endregion
@@ -115,24 +124,26 @@ class Carousel{
 
     goNext(){
         if(this._index == this._nImg-1){
-            console.log('Foto terminate!')
+            console.debug('Foto terminate!')
             return
         }
         this._index++
         
         this.updateTranslate()
-        console.log('Vai a destra')
+        console.debug('Vai a destra')
     }
      
     goPrev(){
         if(this._index == 0 ){
-            console.log('Non puoi tornare indietro')
+            console.debug('Non puoi tornare indietro')
             return
         }
         this._index--
         this.updateTranslate()
-        console.log('Vai a sinistra')
+        console.debug('Vai a sinistra')
     }
 
     //#endregion
 }
+
+customElements.define('labycar-carousel', Carousel)
