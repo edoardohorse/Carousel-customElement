@@ -3,6 +3,42 @@ class Carousel{
     get nImg(){return this._nImg}
     get lastIndex(){ return this._nImg-1}
 
+    get title(){return this.root.getAttribute('title')}
+    set title(v){
+        this.root.setAttribute('title', v);
+        this.root.titleEl.textContent = v
+    }
+
+    static HEADER_POSITION = ['top','bottom'] 
+
+    get headerPosition(){
+        if(this.root.hasAttribute('header-position'))
+            return this.root.getAttribute('header-position')
+        
+        // Default
+        return 'top'
+    }
+
+    set headerPosition(v){
+        if(v in HEADER_POSITION){
+            return this.root.setAttribute('header-position', v)
+        }
+        return console.error('Valore %c non inesistente. Usare %c', v, HEADER_POSITION)
+    }
+
+    get headerAbove(){
+        if(this.root.hasAttribute('header-above')){
+            return this.root.getAttribute('header-above')
+        }
+    }
+
+    set headerAbove(v){
+        if(v in [true,false]){
+            this.root.setAttribute('header-above', v)
+        }
+
+    }
+
     set index(index){
         index = index-1
         if(index < 0 && index >= this._nImg){
@@ -15,46 +51,67 @@ class Carousel{
 
     constructor(el){
 
-        // this.el = document.createElement('div')
-        // this.el.classList.add('wrapper')
-        this.el         = el
-        this.header     = el.querySelector('header')
-        this.wrapper    = el.querySelector('main')
-        this.footer     = el.querySelector('footer')
+        //#region Root
+        this.root           = el
+        this.root.header    = el.querySelector('header')
+        this.root.wrapper   = el.querySelector('main')
+        this.root.footer    = el.querySelector('footer')
 
-        this.btnPrev = document.createElement('button')
-        this.btnPrev.textContent = `<`
-        this.btnNext = document.createElement('button')
-        this.btnNext.textContent = `>`
-
-        this.footer.appendChild(this.btnPrev)
-        this.footer.appendChild(this.btnNext)
-
-        // el.appendChild(this.el)
+        // header
+        this.root.titleEl = document.createElement('p')
+        this.root.titleEl.textContent = this.root.getAttribute('title')
         
-        // L'indice parte da 0. Ma per l'utente parte da 1
-        this._index     = 0
-        this._offset    = 100 
-        this._nImg      = this.el.querySelectorAll('img').length
+        this.root.subtitleEl = document.createElement('p')
+        this.root.subtitleEl.textContent = this.root.getAttribute('subtitle')
 
-        this.updateTranslate = () =>{ this.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`}
+        this.root.header.appendChild(this.root.titleEl)
+        this.root.header.appendChild(this.root.subtitleEl)
 
+        // footer
+        this.root.btnPrev = document.createElement('button')
+        this.root.btnPrev.textContent = `<`
+        this.root.btnNext = document.createElement('button')
+        this.root.btnNext.textContent = `>`
+
+        this.root.footer.appendChild(this.root.btnPrev)
+        this.root.footer.appendChild(this.root.btnNext)
+
+        //#endregion
+
+        //#region Fields         
+        
+            // L'indice parte da 0. Ma per l'utente parte da 1
+            this._index     = 0
+            this._offset    = 100 
+            this._nImg      = this.root.querySelectorAll('div').length
+            
+        //#endregion
+        
         this.addEventListener()
     }
 
+    //#region Private
+    
     addEventListener(){
-        this.btnNext.addEventListener('click', this.goNext.bind(this))
-        this.btnPrev.addEventListener('click', this.goPrev.bind(this))
-
+        this.root.btnNext.addEventListener('click', this.goNext.bind(this))
+        this.root.btnPrev.addEventListener('click', this.goPrev.bind(this))
+        
         document.addEventListener('keydown', e=>{
             switch(e.keyCode){
                 case 37: this.goPrev();break;   // <-
                 case 39: this.goNext();         // ->
-
+                
             }
         })
     }
+      
+    updateTranslate(){
+        this.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
+    }
 
+    //#endregion
+
+    //#region Methods
 
     goNext(){
         if(this._index == this._nImg-1){
@@ -66,8 +123,7 @@ class Carousel{
         this.updateTranslate()
         console.log('Vai a destra')
     }
-    
-    
+     
     goPrev(){
         if(this._index == 0 ){
             console.log('Non puoi tornare indietro')
@@ -77,4 +133,6 @@ class Carousel{
         this.updateTranslate()
         console.log('Vai a sinistra')
     }
+
+    //#endregion
 }
