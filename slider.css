@@ -1,0 +1,52 @@
+labycar-carousel{
+    display: inline-block;
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border: 1px solid black;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.wrapper{
+    position: relative;
+    background-color: blue;
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    height: 100%;
+    transition: transform 200ms;
+    /* transform: translateX(-100%); */
+}
+
+.wrapper img{
+    min-width: 100%;
+    /* height: 50px; */
+    background-color: grey;
+    border: 1px solid black;
+    box-sizing: border-box;
+    font-size: 50px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+footer{
+    position: absolute;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer button{
+    width: 25px;
+    line-height: 25px;
+    height: 25px;
+    background-color: red;
+    text-align: center;
+    border: 1px dotted black;
+    cursor: pointer;
+}
