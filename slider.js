@@ -1,29 +1,36 @@
-class LabyCarSlider extends HTMLElement{
+class Carousel{
 
-    constructor(){
-        super()
+    constructor(el){
 
-        // console.log('Hai aggiunto un custom Element')
-        this.root   = this.attachShadow({mode: 'open'})
-        this.script = document.createElement("script")
-        this.script.src = ''
+        this.el = document.createElement('div')
+        this.el.classList.add('carousel')
 
-        this.root.innerHTML  = `
-            <style>
-                :host{
-                    font-size: 20px;
-                    font-family: monospace;
-                }
-            </style>
-        `
-        this.root.innerHTML +='<p>Prova</p>'
+        this.btnPrev = document.createElement('button')
+        this.btnPrev.value = `<`
+        this.btnNext = document.createElement('button')
+        this.btnNext.value = `>`
+
+        this.el.appendChild(this.btnNext)
+        this.el.appendChild(this.btnPrev)
+
+        el.appendChild(this)
+        
+        this.addEventListener()
     }
 
-    connectedCallback(){
-        this.root.appendChild(this.script)
+    addEventListener(){
+        this.btnNext.addEventListener('click', this.goNext.bind(this))
+        this.btnPrev.addEventListener('click', this.goPrev.bind(this))
+    }
+
+    goTo(index){//TODO }
+
+    goNext(){
 
     }
 
+
+    goPrev(){
+
+    }
 }
-
-customElements.define('labycar-slider', LabyCarSlider)

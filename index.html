@@ -1,29 +1,24 @@
 <html>
     <head>
-        <style>
-            body{
-                font-size: 15px;
-                font-family: Arial, Helvetica, sans-serif;
-                margin: 0;
-            }
-        </style>
+        <meta charset="utf8">
+        <link rel="stylesheet" href="slider.css">
     </head>
     <body>
         <p>Testo al di fuori</p>
 
-        <labycar-slider>
-            <img data-src="img/1.jpg" alt="">
-            <img data-src="img/2.jpg" alt="">
-            <img data-src="img/3.jpg" alt="">
-            <img data-src="img/4.jpg" alt="">
-            <img data-src="img/5.jpg" alt="">
-            <img data-src="img/6.jpg" alt="">
-            <img data-src="img/7.jpg" alt="">
-            <img data-src="img/8.jpg" alt="">
-            <img data-src="img/9.jpg" alt="">
-        </labycar-slider>
-
-        <labycar-slider></labycar-slider>
+        <labycar-carousel>
+            <img src="./img/1.jpg" >
+            <img src="./img/2.jpg" >
+            <img src="./img/3.jpg" >
+            <img src="./img/4.jpg" >
+            <img src="./img/5.jpg" >
+            <img src="./img/6.jpg" >
+            <img src="./img/7.jpg" >
+        </labycar-carousel>
+        
     </body>
     <script src="slider.js" ></script>
+    <script>
+        new Carousel(document.querySelector('labycar-carousel'))
+    </script>
 </html>
