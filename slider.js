@@ -1,7 +1,17 @@
 class Carousel{
-
+    get index(){return this._index+1}
     get nImg(){return this._nImg}
     get lastIndex(){ return this._nImg-1}
+
+    set index(index){
+        index = index-1
+        if(index < 0 && index >= this._nImg){
+            return console.log('Indice non valido')
+        }
+
+        this._index = index
+        this.updateTranslate() 
+    }
 
     constructor(el){
 
@@ -22,9 +32,12 @@ class Carousel{
 
         // el.appendChild(this.el)
         
+        // L'indice parte da 0. Ma per l'utente parte da 1
         this._index     = 0
         this._offset    = 100 
         this._nImg      = this.el.querySelectorAll('img').length
+
+        this.updateTranslate = () =>{ this.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`}
 
         this.addEventListener()
     }
@@ -34,8 +47,6 @@ class Carousel{
         this.btnPrev.addEventListener('click', this.goPrev.bind(this))
     }
 
-    goTo(index){//TODO
-    }
 
     goNext(){
         if(this._index == this._nImg-1){
@@ -43,8 +54,8 @@ class Carousel{
             return
         }
         this._index++
-        this.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
         
+        this.updateTranslate()
         console.log('Vai a destra')
     }
     
@@ -55,7 +66,7 @@ class Carousel{
             return
         }
         this._index--
-        this.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
+        this.updateTranslate()
         console.log('Vai a sinistra')
     }
 }
