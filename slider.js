@@ -45,6 +45,14 @@ class Carousel{
     addEventListener(){
         this.btnNext.addEventListener('click', this.goNext.bind(this))
         this.btnPrev.addEventListener('click', this.goPrev.bind(this))
+
+        document.addEventListener('keydown', e=>{
+            switch(e.keyCode){
+                case 37: this.goPrev();break;   // <-
+                case 39: this.goNext();         // ->
+
+            }
+        })
     }
 
 
