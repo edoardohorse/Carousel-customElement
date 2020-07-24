@@ -4,14 +4,18 @@ class Carousel extends HTMLElement{
         return ['title', 'subtitle', 'header-position', 'header-above']
     }
 
+    static OFFSET_TOUCH_X = 100
+
     get index(){return this._index+1}
     get nImg(){return this._nImg}
     get lastIndex(){ return this._nImg-1}
 
     set index(index){
         index = index-1
-        if(index < 0 && index >= this._nImg){
-            return console.debug('Indice non valido')
+        if(index < 0 || index >= this._nImg) return log(`Indice ${index+1} non valido [0-${this._nImg}]`)
+
+        if(this._isTransitioning){
+            return console.debug('Transizione in corso...')
         }
 
         this._index = index
@@ -74,6 +78,8 @@ class Carousel extends HTMLElement{
             this._index     = 0
             this._offset    = 100 
             this._nImg      = this.root.querySelectorAll('div').length
+            this._isTransitioning = false
+            
             
         //#endregion
         
@@ -112,9 +118,51 @@ class Carousel extends HTMLElement{
                 
             }
         })
+
+        
+        this.root.footer.addEventListener('touchstart', e=>{
+
+            this._touchOffsetX = 0
+            this._touchStartX = e.touches[0].pageX   
+            this._
+
+        })
+        
+        this.root.footer.addEventListener('touchmove', e=>{
+            
+            this._touchOffsetX = e.touches[0].pageX - this._touchStartX;
+            
+
+            if( Math.abs(this._touchOffsetX) < Carousel.OFFSET_TOUCH_X ){
+                return
+            }
+
+            // Vai a sinistra (scroll sinistra -> destra)
+            if(this._touchOffsetX >= 0){
+                
+                // hijacked
+                this.goPrev()
+                
+                return
+            }
+
+            // Altrimenti vai a destra (scroll sinistra <- destra)
+            this.goNext()
+
+        })
+        
+        // this.root.wrapper.addEventListener('transitionstart', _=>{
+        //     this._isTransitioning = true
+        // })
+        
+        this.root.wrapper.addEventListener('transitionend', _=>{
+            this._isTransitioning = false
+            console.debug('Transizione finita!')
+        })
     }
       
     updateTranslate(){
+        this._isTransitioning = true
         this.root.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
     }
 
@@ -123,24 +171,11 @@ class Carousel extends HTMLElement{
     //#region Methods
 
     goNext(){
-        if(this._index == this._nImg-1){
-            console.debug('Foto terminate!')
-            return
-        }
-        this._index++
-        
-        this.updateTranslate()
-        console.debug('Vai a destra')
+        this.index++
     }
      
     goPrev(){
-        if(this._index == 0 ){
-            console.debug('Non puoi tornare indietro')
-            return
-        }
-        this._index--
-        this.updateTranslate()
-        console.debug('Vai a sinistra')
+        this.index--
     }
 
     //#endregion
