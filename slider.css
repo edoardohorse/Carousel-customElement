@@ -23,6 +23,16 @@
     overflow: hidden;
 }
 
+:host([size='big']){
+    width: var(--size-big);
+    height: var(--size-big);
+}
+
+:host([size='small']){
+    width: var(--size-small);
+    height: var(--size-small);
+}
+
 :host([header-above='false']) > header {
     position: relative;
 }
@@ -114,4 +124,13 @@ footer button {
     color: white;
     user-select: none;
     font-size: 20px;
+}
+
+:host([size='small']) button{
+    height: 25px;
+}
+
+:host([size='small']) footer{
+    align-items: flex-end;
+    justify-content: center;
 }

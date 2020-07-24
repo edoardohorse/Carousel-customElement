@@ -2,7 +2,7 @@
 |Value attribute| size
 |----------|:-------------:|
 |big| 500x500 px|
-|medium|300x300 px|
+|medium|350x350 px|
 |small|150x150 px|
 
 Custom size can be setted by **width** and **height** attribute
@@ -12,8 +12,8 @@ Custom size can be setted by **width** and **height** attribute
 ```html
     <labycar-carousel
         size='big|[medium]|small'
-        width='[300px]'
-        height='[300px]'
+        width='[350px]'
+        height='[350px]'
 
         title='Title'
         subtitle='Subtitle'

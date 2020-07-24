@@ -1,10 +1,11 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size']
     }
 
-    static OFFSET_TOUCH_X = 100
+    static OFFSET_TOUCH_X   = 100
+    static SIZES            = ['big','medium','small']
 
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -101,7 +102,6 @@ class Carousel extends HTMLElement{
                 this.root.subtitleEl.textContent = newValue
                 break
             }
-
         }
     }
 
