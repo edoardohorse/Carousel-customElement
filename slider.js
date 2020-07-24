@@ -20,6 +20,20 @@ class Carousel extends HTMLElement{
         }
 
         this._index = index
+
+        if(this._index == 0){
+            this.disableBtnPrev()
+            this.enableBtnNext()
+        }
+        else if(this._index == this._nImg-1){
+            this.enableBtnPrev()
+            this.disableBtnNext()
+        }
+        else{
+            this.enableBtnNext()
+            this.enableBtnPrev()
+        }
+
         this.updateTranslate() 
     }
 
@@ -88,7 +102,11 @@ class Carousel extends HTMLElement{
     }
 
     connectedCallback(){
-
+        if(this._nImg == 1){
+            this.disableBtnNext()
+            this.disableBtnPrev()
+        }
+        this.disableBtnPrev()
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -165,6 +183,12 @@ class Carousel extends HTMLElement{
         this._isTransitioning = true
         this.root.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
     }
+
+    enableBtnPrev(){this.root.btnPrev.disabled = false}
+    disableBtnPrev(){this.root.btnPrev.disabled = true}
+    
+    enableBtnNext(){this.root.btnNext.disabled = false}
+    disableBtnNext(){this.root.btnNext.disabled = true}
 
     //#endregion
 

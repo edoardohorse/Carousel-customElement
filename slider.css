@@ -141,6 +141,7 @@ footer button {
     color: white;
     user-select: none;
     font-size: 20px;
+    transition: opacity 150ms;
 }
 
 :host([size='small']) button{
@@ -150,4 +151,9 @@ footer button {
 :host([size='small']) footer{
     align-items: flex-end;
     justify-content: center;
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: none;
 }
