@@ -46,6 +46,14 @@
     display: none;
 }
 
+:host([size='small']) header{
+    position: relative;
+    order: 1;
+    height: 30px;
+    padding: .3em 0 0 .3em;
+}
+
+
 header {
     display: flex;
     flex-direction: column;
@@ -57,7 +65,6 @@ header {
     background-color: rgba(255,255,255,.8);
     /* Default above */
     position: absolute;
-    /* top: 0; */
     z-index: 10;
     box-sizing: border-box;
 }
@@ -74,6 +81,16 @@ header > span:first-child {
 /* Sottotitolo */
 header > span:last-child {
     font-size: var(--subtitle-font-size);
+}
+
+:host([size='small']) header > span:first-child {
+    font-size: 20px;
+    padding: 0;
+    line-height: 1em;
+}
+
+:host([size='small']) header > span:last-child {
+    display:none;
 }
 
 :host[btn='bottom'] > footer {
