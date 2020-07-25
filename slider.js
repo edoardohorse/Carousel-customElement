@@ -1,7 +1,7 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height']
     }
 
     static OFFSET_TOUCH_X   = 100
@@ -120,6 +120,16 @@ class Carousel extends HTMLElement{
                 this.root.subtitleEl.textContent = newValue
                 break
             }
+
+            case 'width':{
+                this.style.setProperty('--size-width-custom', newValue+'px');
+                break
+            }
+            
+            case 'height':{
+                this.style.setProperty('--size-height-custom', newValue+'px');
+                break
+            }
         }
     }
 
@@ -142,7 +152,6 @@ class Carousel extends HTMLElement{
 
             this._touchOffsetX = 0
             this._touchStartX = e.touches[0].pageX   
-            this._
 
         })
         
