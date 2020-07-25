@@ -214,4 +214,4 @@ class Carousel extends HTMLElement{
     //#endregion
 }
 
-customElements.define('labycar-carousel', Carousel)
+customElements.define('custom-carousel', Carousel)
