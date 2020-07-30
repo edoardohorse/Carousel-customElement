@@ -1,6 +1,7 @@
 ## Title & Subtitle: *string*
 Give a title and a subtitle to the carousel
 
+---
 
 ## Header
 
@@ -22,6 +23,11 @@ Header can lay above the images (z-Index greater) or make its own space.
 
 Custom size can be setted by **width** and **height** attribute
 
+## *Drag*: (true | [false])
+
+Make the swipe available with mouse. 
+
+---
 
 ---
 ### ⚠️ Important
@@ -43,7 +49,9 @@ Custom size can be setted by **width** and **height** attribute
         subtitle='Subtitle'
         
         header-position='[top]|bottom'
-        header-above='[true]|false'>
+        header-above='[true]|false'
+        
+        drag = 'true|[false]']>
 
             <img data-src='img/foo.jpg'>
             <img data-src='img/foo2.jpg'>

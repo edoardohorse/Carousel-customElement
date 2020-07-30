@@ -3,13 +3,10 @@
     --btn-color: white;
     --title-font-size: 27px;
     --subtitle-font-size: 17px;
-    
     --size-big: 500px;
     --size-medium: 350px;
     --size-small: 150px;
-
     --transition-slide-duration: 300ms;
-
     margin: auto;
     margin-top: 5em;
     display: flex;
@@ -17,8 +14,7 @@
     position: relative;
     width: var(--size-medium);
     height: var(--size-medium);
-    /* border: 1px solid black; */
-    box-shadow: 0px 0px 7px 1px rgba(0,0,0,.5);
+    /* box-shadow: 0px 0px 7px 1px rgba(0,0,0,.5); */
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -60,12 +56,21 @@
     max-height: 75px;
 }
 
-:host([size='small']) header{
+:host([size='small']) > header{
     position: relative;
     order: 1;
     height: 30px;
     padding: .3em 0 0 .3em;
 }
+
+:host([drag]) > footer{
+    cursor: grab;
+}
+
+:host([drag="false"]) > footer{
+    cursor: default;   
+}
+
 
 
 header {
@@ -123,6 +128,14 @@ main {
     z-index: 5;
 }
 
+main.dragged{
+    transition: none;
+}
+
+main.dragged ~ footer{
+    cursor: grabbing !important;
+}
+
 main > * {
     position: relative;
     min-width: 100%;
@@ -170,5 +183,5 @@ footer button {
 
 button:disabled {
     opacity: .4;
-    cursor: none;
+    cursor: not-allowed;
 }
