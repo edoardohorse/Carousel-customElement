@@ -1,15 +1,41 @@
 :host {
-    --btn-bg: rgba(0,0,0,.75);--btn-color: white;--title-font-size: 27px;--subtitle-font-size: 17px;margin: auto;
+    --btn-bg: rgba(0,0,0,.75);
+    --btn-color: white;
+    --title-font-size: 27px;
+    --subtitle-font-size: 17px;
+    --size-big: 500px;
+    --size-medium: 350px;
+    --size-small: 150px;
+    --transition-slide-duration: 300ms;
+    margin: auto;
     margin-top: 5em;
     display: flex;
     flex-direction: column;
     position: relative;
-    width: 500px;
-    height: 500px;
-    /* border: 1px solid black; */
-    box-shadow: 0px 0px 7px 1px rgba(0,0,0,.5);
+    width: var(--size-medium);
+    height: var(--size-medium);
+    /* box-shadow: 0px 0px 7px 1px rgba(0,0,0,.5); */
     box-sizing: border-box;
     overflow: hidden;
+}
+
+
+:host([size='big']){
+    width: var(--size-big);
+    height: var(--size-big);
+}
+
+:host([size='small']){
+    width: var(--size-small);
+    height: var(--size-small);
+}
+
+:host([width]){
+    width: var(--size-width-custom);
+}
+
+:host([height]){
+    height: var(--size-height-custom);
 }
 
 :host([header-above='false']) > header {
@@ -25,18 +51,41 @@
     display: none;
 }
 
+
+:host([subtitle]) > header {
+    max-height: 75px;
+    height: auto;
+}
+
+:host([size='small']) > header{
+    position: relative;
+    order: 1;
+    height: 30px;
+    padding: .3em 0 0 .3em;
+}
+
+:host([drag]) > footer{
+    cursor: grab;
+}
+
+:host([drag="false"]) > footer{
+    cursor: default;   
+}
+
+
+
 header {
     display: flex;
     flex-direction: column;
     order: 1;
     width: 100%;
-    height: 75px;
+    height: 25%;
+    max-height: 55px;
     padding: 1em 0 0 1em;
     line-height: 1.7em;
     background-color: rgba(255,255,255,.8);
     /* Default above */
     position: absolute;
-    /* top: 0; */
     z-index: 10;
     box-sizing: border-box;
 }
@@ -55,6 +104,16 @@ header > span:last-child {
     font-size: var(--subtitle-font-size);
 }
 
+:host([size='small']) header > span:first-child {
+    font-size: 20px;
+    padding: 0;
+    line-height: 1em;
+}
+
+:host([size='small']) header > span:last-child {
+    display:none;
+}
+
 :host[btn='bottom'] > footer {
     bottom: 0;
 }
@@ -65,9 +124,17 @@ main {
     flex-grow: 1;
     flex-flow: row nowrap;
     will-change: transform;
-    transition: transform 350ms;
+    transition: transform var(--transition-slide-duration);
     transition-timing-function: cubic-bezier(0.465, 0.183, 0.153, 0.946);
     z-index: 5;
+}
+
+main.dragged{
+    transition: none;
+}
+
+main.dragged ~ footer{
+    cursor: grabbing !important;
 }
 
 main > * {
@@ -103,4 +170,19 @@ footer button {
     color: white;
     user-select: none;
     font-size: 20px;
+    transition: opacity 150ms;
+}
+
+:host([size='small']) button{
+    height: 25px;
+}
+
+:host([size='small']) footer{
+    align-items: flex-end;
+    justify-content: center;
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
 }

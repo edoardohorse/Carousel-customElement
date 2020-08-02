@@ -1,17 +1,34 @@
 <html>
     <head>
         <meta charset="utf8">
+        <meta http-equiv="cache-control" content="no-cache">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
 
-        <labycar-carousel>
-                <div data-src="./img/1.jpg"></div>
-                <div data-src="./img/2.jpg"></div>
-                <div data-src="./img/3.jpg"></div>
-        </labycar-carousel>
-    </body>
+        <custom-carousel title='Titolo' width=300 height=200 drag=true>
+            <div data-src="./img/1.jpg"></div>
+            <div data-src="./img/2.jpg"></div>
+            <div data-src="./img/3.jpg"></div>
+        </custom-carousel>
+        
+        <custom-carousel title='Intestazione' width=400>
+            <div data-src="./img/1.jpg"></div>
+            <div data-src="./img/2.jpg"></div>
+            <div data-src="./img/3.jpg"></div>
+        </custom-carousel>
 
+        <div id='log'>
+
+        </div>
+    </body>
+    <script>
+        const div = document.querySelector('#log')
+        function log(s){
+            console.debug(s)
+            div.innerHTML = `<p>${s}</p>` + div.innerHTML
+        }
+    </script>
     <script src="slider.js" defer></script>
     
 </html>
