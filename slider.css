@@ -54,6 +54,7 @@
 
 :host([subtitle]) > header {
     max-height: 75px;
+    height: auto;
 }
 
 :host([size='small']) > header{
