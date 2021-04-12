@@ -141,7 +141,7 @@ main > * {
     position: relative;
     min-width: 100%;
     box-sizing: border-box;
-    background-image: url(./img/2.jpg);
+    /* background-image: url(./img/2.jpg); */
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;

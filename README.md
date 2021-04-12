@@ -53,8 +53,8 @@ Make the swipe available with mouse.
         
         drag = 'true|[false]']>
 
-            <img data-src='img/foo.jpg'>
-            <img data-src='img/foo2.jpg'>
-            <img data-src='img/foo3.jpg'>
+            <img src='img/foo.jpg'>
+            <img src='img/foo2.jpg'>
+            <img src='img/foo3.jpg'>
     </custom-carousel>
 ```

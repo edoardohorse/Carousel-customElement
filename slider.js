@@ -1,11 +1,15 @@
     class Carousel extends HTMLElement{
 
         static get observedAttributes(){
-            return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag']
+            return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop']
         }
 
-        static OFFSET_TOUCH_X   = 100
-        
+        static OFFSET_TOUCH_X       = 100
+        static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])
+        static ATTR_HEADER_ABOVE    = new Set(['true', 'false'])
+        static ATTR_SIZE            = new Set(['big','medium','small'])
+        static ATTR_DRAG            = new Set(['true', 'false', ''])
+        static ATTR_LOOP            = new Set(['true', 'false', ''])
 
         get title(){ return this.getAttribute("title")}
         set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -13,15 +17,12 @@
         get subtitle(){ return this.getAttribute("subtitle")}
         set subtitle(v){ v == ""? this.removeAttribute("subtitle"): this.setAttribute("subtitle", v)}
 
-        static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])
         get headerPosition(){ return this.getAttribute("header-position")}
         set headerPosition(v){this.setAttribute("header-position", v)}
         
-        static ATTR_HEADER_ABOVE = new Set(['true', 'false'])
         get headerAbove(){ return this.getAttribute("header-above")}
         set headerAbove(v){this.setAttribute("header-above", v)}
         
-        static ATTR_SIZE = new Set(['big','medium','small'])
         get size(){ return this.getAttribute("size")}
         set size(v){this.setAttribute("size", v)}
 
@@ -31,33 +32,38 @@
         get height(){ return this.getAttribute("height")}
         set height(v){ this.setAttribute("height", v)}
 
-        static ATTR_DRAG = new Set(['true', 'false'])
         get drag(){ return this.getAttribute("drag")}
         set drag(v){ this.setAttribute("drag", v)}
         
-        // static HEADER_POSITION = Set('top', 'bottom')
-        // get headerPosition(){ return this.getAttribute("header-position")}
-        // set headerPosition(v){ HEADER_POSITION.has(v)? this.setAttribute("header-position", v): null }
-
+        get loop(){ return this.getAttribute("loop")}
+        set loop(v){ this.setAttribute("loop", v)}
+        
         get index(){return this._index+1}
         get nImg(){return this._nImg}
         get lastIndex(){ return this._nImg-1}
 
         set index(index){
             index = index-1
-            if(index < 0 || index >= this._nImg) return log(`Indice ${index+1} non valido [0-${this._nImg}]`)
+
+            if(this._isLooped)
+                if      ( index < 0 )           index = this._nImg-1
+                else if ( index > this._nImg-1) index = 0
+            else
+                if(index < 0 || index >= this._nImg) return log(`Indice ${index+1} non valido [0-${this._nImg}]`)
+
 
             if(this._isTransitioning){
                 return console.debug('Transizione in corso...')
             }
 
+
             this._index = index
 
-            if(this._index == 0){
+            if(this._index == 0 && !this._isLooped){
                 this.disableBtnPrev()
                 this.enableBtnNext()
             }
-            else if(this._index == this._nImg-1){
+            else if(this._index == this._nImg-1 && !this._isLooped){
                 this.enableBtnPrev()
                 this.disableBtnNext()
             }
@@ -66,6 +72,7 @@
                 this.enableBtnPrev()
             }
 
+            // console.debug(`Indice ${this.index}`)
             this.updateTranslate() 
         }
 
@@ -74,8 +81,8 @@
 
             //#region Root
             this.root           = this.attachShadow({mode: 'open'})
-            this.root.header    = document.createElement('header')  // zIndex: 10
             this.root.wrapper   = document.createElement('main')    // zIndex: 5
+            this.root.header    = document.createElement('header')  // zIndex: 10
             this.root.footer    = document.createElement('footer')  // zIndex: 15
             this.root.style     = document.createElement('link')
 
@@ -105,12 +112,16 @@
             this.root.footer.appendChild(this.root.btnNext)
 
             //images
-            this.querySelectorAll('div').forEach(div=>{
+            this.querySelectorAll('img').forEach(img=>{
 
-                this.removeChild(div)
+                
+                let div = document.createElement('div')
+                div.setAttribute('data-src', img.src)                
                 this.root.wrapper.appendChild(div)
-                div.style.backgroundImage= `url(${div.dataset.src})`
 
+                div.style.backgroundImage = `url(${img.src})`
+                
+                this.removeChild(img)
             })
 
             this.root.appendChild(this.root.header)
@@ -123,8 +134,9 @@
             
                 // L'indice parte da 0. Ma per l'utente parte da 1
                 this._index             = 0
-                this._offset            = 100 
-                this._nImg              = this.root.querySelectorAll('div').length
+                this._offset            = 100
+                this._nImg              = this.root.wrapper.childElementCount
+                this._isLooped          = false
                 this._isTransitioning   = false
                 this._isDraggable       = false
                 this._isDragging        = false
@@ -211,7 +223,9 @@
                 this.disableBtnNext()
                 this.disableBtnPrev()
             }
-            this.disableBtnPrev()
+
+            if(!this._isLooped)
+                this.disableBtnPrev()
 
             this.addEventListener()
         }
@@ -269,6 +283,24 @@
 
                     if(newValue == "true" || newValue == "")    this.setEventListenerDrag(true)
                     else if(newValue == "false")                this.setEventListenerDrag(false)
+                    break               
+                }
+                
+                case 'loop':{
+                    if(!Carousel.ATTR_LOOP.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_LOOP)
+
+                    if(newValue == "true" || newValue == ""){
+                        this._isLooped = true;
+                        
+                        this.enableBtnsNextPrev();
+                    }
+                    else if(newValue == "false"){
+                        this._isLooped = false
+                        
+                        if(this._index == 0)            { this.disableBtnPrev(); break;}
+                        if(this._index == this._nImg-1) { this.disableBtnNext(); break;}
+                    }
+                    
                     break               
                 }
             }
@@ -349,6 +381,8 @@
         
         enableBtnNext(){this.root.btnNext.disabled = false}
         disableBtnNext(){this.root.btnNext.disabled = true}
+
+        enableBtnsNextPrev(){ this.enableBtnNext(); this.enableBtnPrev();}
 
         //#endregion
 
