@@ -1,14 +1,15 @@
     class Carousel extends HTMLElement{
 
         static get observedAttributes(){
-            return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag']
+            return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop']
         }
 
         static OFFSET_TOUCH_X       = 100
         static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])
         static ATTR_HEADER_ABOVE    = new Set(['true', 'false'])
         static ATTR_SIZE            = new Set(['big','medium','small'])
-        static ATTR_DRAG            = new Set(['true', 'false'])
+        static ATTR_DRAG            = new Set(['true', 'false', ''])
+        static ATTR_LOOP            = new Set(['true', 'false', ''])
 
         get title(){ return this.getAttribute("title")}
         set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -34,25 +35,35 @@
         get drag(){ return this.getAttribute("drag")}
         set drag(v){ this.setAttribute("drag", v)}
         
+        get loop(){ return this.getAttribute("loop")}
+        set loop(v){ this.setAttribute("loop", v)}
+        
         get index(){return this._index+1}
         get nImg(){return this._nImg}
         get lastIndex(){ return this._nImg-1}
 
         set index(index){
             index = index-1
-            if(index < 0 || index >= this._nImg) return log(`Indice ${index+1} non valido [0-${this._nImg}]`)
+
+            if(this._isLooped)
+                if      ( index < 0 )           index = this._nImg-1
+                else if ( index > this._nImg-1) index = 0
+            else
+                if(index < 0 || index >= this._nImg) return log(`Indice ${index+1} non valido [0-${this._nImg}]`)
+
 
             if(this._isTransitioning){
                 return console.debug('Transizione in corso...')
             }
 
+
             this._index = index
 
-            if(this._index == 0){
+            if(this._index == 0 && !this._isLooped){
                 this.disableBtnPrev()
                 this.enableBtnNext()
             }
-            else if(this._index == this._nImg-1){
+            else if(this._index == this._nImg-1 && !this._isLooped){
                 this.enableBtnPrev()
                 this.disableBtnNext()
             }
@@ -61,6 +72,7 @@
                 this.enableBtnPrev()
             }
 
+            // console.debug(`Indice ${this.index}`)
             this.updateTranslate() 
         }
 
@@ -124,6 +136,7 @@
                 this._index             = 0
                 this._offset            = 100
                 this._nImg              = this.root.wrapper.childElementCount
+                this._isLooped          = false
                 this._isTransitioning   = false
                 this._isDraggable       = false
                 this._isDragging        = false
@@ -210,7 +223,9 @@
                 this.disableBtnNext()
                 this.disableBtnPrev()
             }
-            this.disableBtnPrev()
+
+            if(!this._isLooped)
+                this.disableBtnPrev()
 
             this.addEventListener()
         }
@@ -268,6 +283,24 @@
 
                     if(newValue == "true" || newValue == "")    this.setEventListenerDrag(true)
                     else if(newValue == "false")                this.setEventListenerDrag(false)
+                    break               
+                }
+                
+                case 'loop':{
+                    if(!Carousel.ATTR_LOOP.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_LOOP)
+
+                    if(newValue == "true" || newValue == ""){
+                        this._isLooped = true;
+                        
+                        this.enableBtnsNextPrev();
+                    }
+                    else if(newValue == "false"){
+                        this._isLooped = false
+                        
+                        if(this._index == 0)            { this.disableBtnPrev(); break;}
+                        if(this._index == this._nImg-1) { this.disableBtnNext(); break;}
+                    }
+                    
                     break               
                 }
             }
@@ -348,6 +381,8 @@
         
         enableBtnNext(){this.root.btnNext.disabled = false}
         disableBtnNext(){this.root.btnNext.disabled = true}
+
+        enableBtnsNextPrev(){ this.enableBtnNext(); this.enableBtnPrev();}
 
         //#endregion
 
