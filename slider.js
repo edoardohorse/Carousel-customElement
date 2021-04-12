@@ -1,15 +1,19 @@
-    class Carousel extends HTMLElement{
+
+
+
+class Carousel extends HTMLElement{
 
         static get observedAttributes(){
-            return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop']
+            return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'navigation']
         }
 
         static OFFSET_TOUCH_X       = 100
-        static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])
-        static ATTR_HEADER_ABOVE    = new Set(['true', 'false'])
+        static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])    // TODO settare il valore di default
+        static ATTR_HEADER_ABOVE    = new Set(['true', 'false'])    // TODO settare il valore di default
         static ATTR_SIZE            = new Set(['big','medium','small'])
         static ATTR_DRAG            = new Set(['true', 'false', ''])
         static ATTR_LOOP            = new Set(['true', 'false', ''])
+        static ATTR_NAVIGATION      = new Set(['dotted', 'preview', ''])
 
         get title(){ return this.getAttribute("title")}
         set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -37,6 +41,9 @@
         
         get loop(){ return this.getAttribute("loop")}
         set loop(v){ this.setAttribute("loop", v)}
+        
+        // get navigation(){ return this.getAttribute("navigation")}
+        // set navigation(v){ this.setAttribute("navigation", v)}
         
         get index(){return this._index+1}
         get nImg(){return this._nImg}
@@ -76,14 +83,15 @@
             this.updateTranslate() 
         }
 
-        constructor(el){
+        constructor(){
             super()
 
             //#region Root
             this.root           = this.attachShadow({mode: 'open'})
             this.root.wrapper   = document.createElement('main')    // zIndex: 5
             this.root.header    = document.createElement('header')  // zIndex: 10
-            this.root.footer    = document.createElement('footer')  // zIndex: 15
+            this.root.aside    = document.createElement('aside')  // zIndex: 15
+            this.root.footer    = document.createElement('footer')  // zIndex: 20
             this.root.style     = document.createElement('link')
 
             //style
@@ -102,17 +110,21 @@
             this.root.header.appendChild(this.root.titleEl)
             this.root.header.appendChild(this.root.subtitleEl)
 
-            // footer
+            // aside
             this.root.btnPrev = document.createElement('button')
             this.root.btnPrev.textContent = `<`
             this.root.btnNext = document.createElement('button')
             this.root.btnNext.textContent = `>`
 
-            this.root.footer.appendChild(this.root.btnPrev)
-            this.root.footer.appendChild(this.root.btnNext)
+            this.root.aside.appendChild(this.root.btnPrev)
+            this.root.aside.appendChild(this.root.btnNext)
+
+            // footer
+            
 
             //images
-            this.querySelectorAll('img').forEach(img=>{
+            let imgs = this.querySelectorAll('img')
+            imgs.forEach(img=>{
 
                 
                 let div = document.createElement('div')
@@ -126,6 +138,7 @@
 
             this.root.appendChild(this.root.header)
             this.root.appendChild(this.root.wrapper)
+            this.root.appendChild(this.root.aside)
             this.root.appendChild(this.root.footer)
 
             //#endregion
@@ -136,6 +149,7 @@
                 this._index             = 0
                 this._offset            = 100
                 this._nImg              = this.root.wrapper.childElementCount
+                this._imgList           = imgs
                 this._isLooped          = false
                 this._isTransitioning   = false
                 this._isDraggable       = false
@@ -144,7 +158,7 @@
                 this._events            = new Map()
                 this._eventsDrag        = {
                     onDragStart : e=>{
-                        if(e.target != this.root.footer)
+                        if(e.target != this.root.aside)
                             return e.preventDefault()
                 
                         this._isDragging = true
@@ -303,6 +317,17 @@
                     
                     break               
                 }
+
+                // case 'navigation':{
+                //     if(!Carousel.ATTR_NAVIGATION.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_NAVIGATION)
+                //     // debugger
+                //     this.root.footer.innerHTML = ""
+
+                //     if(newValue == 'dotted')
+                //         this.root.footer.appendChild(this._createNavigationDottedBar())
+                    
+                //     break
+                // }
             }
         }
 
@@ -322,14 +347,14 @@
             // })
             
             
-            this.root.footer.addEventListener('touchstart', e=>{
+            this.root.aside.addEventListener('touchstart', e=>{
                 log('Touchstart')
                 this._touchOffsetX = 0
                 this._touchStartX = e.touches[0].pageX   
             })
             
                 
-            this.root.footer.addEventListener('touchmove', e=>{
+            this.root.aside.addEventListener('touchmove', e=>{
 
                     this._touchOffsetX = e.touches[0].pageX - this._touchStartX;
                     
@@ -358,22 +383,30 @@
         setEventListenerDrag(add = true){
             
             if(add === true){
-                this.root.footer.addEventListener('mousedown',    this._eventsDrag.onDragStart)
-                this.root.footer.addEventListener('mousemove',    this._eventsDrag.onDragging)
-                this.root.footer.addEventListener('mouseup',      this._eventsDrag.onMouseUp)
-                this.root.footer.addEventListener('mouseleave',   this._eventsDrag.onMouseUp)
+                this.root.aside.addEventListener('mousedown',    this._eventsDrag.onDragStart)
+                this.root.aside.addEventListener('mousemove',    this._eventsDrag.onDragging)
+                this.root.aside.addEventListener('mouseup',      this._eventsDrag.onMouseUp)
+                this.root.aside.addEventListener('mouseleave',   this._eventsDrag.onMouseUp)
             }
             else if(add === false){
-                this.root.footer.removeEventListener('mousedown',    this._eventsDrag.onDragStart)
-                this.root.footer.removeEventListener('mousemove',    this._eventsDrag.onDragging)
-                this.root.footer.removeEventListener('mouseup',      this._eventsDrag.onMouseUp)
-                this.root.footer.removeEventListener('mouseleave',   this._eventsDrag.onMouseUp)
+                this.root.aside.removeEventListener('mousedown',    this._eventsDrag.onDragStart)
+                this.root.aside.removeEventListener('mousemove',    this._eventsDrag.onDragging)
+                this.root.aside.removeEventListener('mouseup',      this._eventsDrag.onMouseUp)
+                this.root.aside.removeEventListener('mouseleave',   this._eventsDrag.onMouseUp)
             }
         }
         
         updateTranslate(){
             this._isTransitioning = true
             this.root.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
+        }
+
+        updateProgress(){
+
+        }
+
+        updateNavigation(){
+
         }
 
         enableBtnPrev(){this.root.btnPrev.disabled = false}
@@ -396,7 +429,105 @@
             this.index--
         }
 
+        // _createNavigationDottedBar(){
+        //     let wrapper = document.createElement('div')
+        //     let dotList = []
+        //     let indexDot = 1
+
+        //     wrapper.setAttribute('data-selected', 1) 
+
+        //     this._imgList.forEach(img=>{
+        //         let dot = document.createElement('ol')
+                
+                
+                
+        //         dot.addEventListener('click', function(ol, index){
+        //             debugger
+        //             console.log(index)
+        //             this.index = index
+                    
+        //             ol.parentElement.querySelector(`ol.selected`).classList.remove('selected')
+        //             ol.parentElement.setAttribute('data-selected', index) 
+        //             ol.classList.add('selected')
+
+        //         }.bind(this, dot, indexDot))
+
+        //         // dot.textContent = indexDot
+        //         wrapper.appendChild(dot)
+        //         dotList.push(dot)
+        //         indexDot++
+        //     })
+
+        //     dotList[this.index-1].classList.add('selected')
+           
+            
+        //     return wrapper
+        // }
         //#endregion
     }
 
-    customElements.define('custom-carousel', Carousel)
+
+class CarouselDottedBar extends Carousel{
+    static get observedAttributes(){
+        return Carousel.observedAttributes
+    }
+
+    get index(){return super.index}
+    set index(index){
+        super.index = index
+
+        this.selectDot( this._dotList[this._index] )
+    }
+
+    constructor(){
+        super()
+        
+        this._dotList = []
+        this._dotSelected = undefined
+
+        let wrapperDot = document.createElement('div')
+        
+        let indexDot = 1 
+        this._imgList.forEach(img=>{
+
+            let dot = document.createElement('ol')        
+            dot.addEventListener('click', function(ol, index){
+                // debugger
+                this.index = index
+                this.selectDot(ol)
+
+            }.bind(this, dot, indexDot))
+
+            wrapperDot.appendChild(dot)
+            this._dotList.push(dot)
+            indexDot++
+        })
+        
+        this.root.footer.appendChild(wrapperDot)
+    }
+
+
+    connectedCallback(){
+        super.connectedCallback()
+
+        this._dotSelected = this._dotList[this._index]
+        this.selectDot( this._dotSelected )
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) { 
+        super.attributeChangedCallback(name, oldValue, newValue)
+    }
+
+    selectDot(dot){
+
+        this._dotSelected.classList.remove('selected')
+        this._dotSelected = dot
+        this._dotSelected.classList.add('selected')
+
+    }
+
+}
+
+    
+customElements.define('custom-carousel', Carousel)
+customElements.define('carousel-dottedbar', CarouselDottedBar)
