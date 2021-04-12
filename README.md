@@ -27,6 +27,10 @@ Custom size can be setted by **width** and **height** attribute
 
 Make the swipe available with mouse. 
 
+## *Loop*: (true | [false])
+
+Enable carousel to loop from first image to last one and viceversa.
+
 ---
 
 ---
@@ -51,7 +55,8 @@ Make the swipe available with mouse.
         header-position='[top]|bottom'
         header-above='[true]|false'
         
-        drag = 'true|[false]']>
+        drag = 'true|[false]']
+        loop = 'true|[false]']>
 
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
