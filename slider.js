@@ -119,7 +119,7 @@
                 div.setAttribute('data-src', img.src)                
                 this.root.wrapper.appendChild(div)
 
-                img.style.backgroundImage = `url(${img.src})`
+                div.style.backgroundImage = `url(${img.src})`
                 
                 this.removeChild(img)
             })
