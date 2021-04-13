@@ -40,8 +40,8 @@ class Carousel extends HTMLElement{
     get loop(){ return this.getAttribute("loop")}
     set loop(v){ this.setAttribute("loop", v)}
     
-    get loop(){ return this.getAttribute("loop")}
-    set loop(v){ this.setAttribute("loop", v)}
+    get progression(){ return this.getAttribute("progression")}
+    set progression(v){ this.setAttribute("progression", v)}
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -509,6 +509,8 @@ class CarouselPreviewBar extends Carousel{
     get index(){return super.index}
     set index(index){
         super.index = index
+
+        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
 
         this.selectPreview( this._previewList[this._index] )
     }
