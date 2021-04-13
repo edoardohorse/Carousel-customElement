@@ -6,35 +6,36 @@
     --size-big: 500px;
     --size-medium: 350px;
     --size-small: 150px;
+    --size-big-preview: 150px;
+    --size-medium-preview: 75px;
     --transition-slide-duration: 300ms;
-    margin: auto;
-    margin-top: 5em;
+    --navigation-preview-opacity: 1;
+    --cubic-bezier-material: cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     flex-direction: column;
     position: relative;
     width: var(--size-medium);
     height: var(--size-medium);
-    /* box-shadow: 0px 0px 7px 1px rgba(0,0,0,.5); */
+    box-shadow: 0px 0px 5px -2px rgb(0 0 0);
     box-sizing: border-box;
     overflow: hidden;
 }
 
-
-:host([size='big']){
+:host([size='big']) {
     width: var(--size-big);
     height: var(--size-big);
 }
 
-:host([size='small']){
+:host([size='small']) {
     width: var(--size-small);
     height: var(--size-small);
 }
 
-:host([width]){
+:host([width]) {
     width: var(--size-width-custom);
 }
 
-:host([height]){
+:host([height]) {
     height: var(--size-height-custom);
 }
 
@@ -51,28 +52,29 @@
     display: none;
 }
 
-
 :host([subtitle]) > header {
     max-height: 75px;
     height: auto;
 }
 
-:host([size='small']) > header{
+:host([size='small']) > header {
     position: relative;
     order: 1;
     height: 30px;
     padding: .3em 0 0 .3em;
 }
 
-:host([drag]) > footer{
+:host([drag]) > aside {
     cursor: grab;
 }
 
-:host([drag="false"]) > footer{
-    cursor: default;   
+:host([drag]):active > aside {
+    cursor: grabbing;
 }
 
-
+:host([drag="false"]) > aside {
+    cursor: default;
+}
 
 header {
     display: flex;
@@ -111,29 +113,29 @@ header > span:last-child {
 }
 
 :host([size='small']) header > span:last-child {
-    display:none;
+    display: none;
 }
 
-:host[btn='bottom'] > footer {
+:host[btn='bottom'] > aside {
     bottom: 0;
 }
 
 main {
     display: flex;
-    order: 2;
+    /* order: 2; */
     flex-grow: 1;
     flex-flow: row nowrap;
     will-change: transform;
     transition: transform var(--transition-slide-duration);
-    transition-timing-function: cubic-bezier(0.465, 0.183, 0.153, 0.946);
+    transition-timing-function: var(--cubic-bezier-material);
     z-index: 5;
 }
 
-main.dragged{
+main.dragged {
     transition: none;
 }
 
-main.dragged ~ footer{
+main.dragged ~ aside {
     cursor: grabbing !important;
 }
 
@@ -148,7 +150,7 @@ main > * {
     user-select: none;
 }
 
-footer {
+aside {
     position: absolute;
     top: 0;
     display: flex;
@@ -159,25 +161,25 @@ footer {
     z-index: 15;
 }
 
-footer button {
+button {
     width: 25px;
     line-height: 25px;
     height: 50px;
-    background-color: #00000061;
+    background-color: rgb(0 0 0 / 40%);
     text-align: center;
-    border: 0;
     cursor: pointer;
     color: white;
     user-select: none;
     font-size: 20px;
     transition: opacity 150ms;
+    border: 1px solid rgb(152 152 152 / 50%);
 }
 
-:host([size='small']) button{
+:host([size='small']) button {
     height: 25px;
 }
 
-:host([size='small']) footer{
+:host([size='small']) aside {
     align-items: flex-end;
     justify-content: center;
 }
@@ -185,4 +187,130 @@ footer button {
 button:disabled {
     opacity: .4;
     cursor: not-allowed;
+}
+
+footer {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    bottom: 0;
+    z-index: 20;
+    height: 0;
+    box-sizing: border-box;
+    opacity: var(--navigation-preview-opacity);
+    background-color: rgb(0 0 0 / 40%);
+    justify-content: center;
+}
+
+footer.extendable{
+    height: 20%;
+    transform: translateY(100%);
+    transition: transform 300ms var(--cubic-bezier-material);
+    transition-delay: 1s;
+    will-change: transform;
+}
+
+aside:hover ~ footer.extendable,
+footer.extendable:hover{
+    transform: translateY(0%);
+    transition-delay: 0s;
+}
+
+footer > div {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+footer > div ol {
+    float: left;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    margin: 5px;
+    background-color: #9e9e9e;
+    border-radius: 50% 50%;
+    cursor: pointer;
+    transition: background-color 150ms;
+}
+
+footer > div ol.selected {
+    background-color: white;
+}
+
+footer > main .preview {
+    width: var(--size-medium-preview);
+    height: calc(100% - 20px);
+    padding: 0;
+    margin: 5px;
+    background-size: cover;
+    cursor: pointer;
+    transform: scale(1);
+    transition: transform 150ms;
+}
+
+footer > main .preview.selected {
+    border: 2px solid red;
+    box-sizing: border-box;
+    transform: scale(0.98);
+}
+
+:host([size='big']) > footer > main .preview {
+    width: var(--size-big-preview);
+}
+
+:host([width]) > footer > main .preview {
+    width: var(--size-big-preview);
+}
+
+:host([size='small']) > footer {
+    display: none;
+}
+
+footer > main {
+    width: auto;
+    position: absolute;
+    height: 100%;
+    align-items: center;
+    left: 25px;
+}
+
+footer > main * {
+    min-width: 50px;
+}
+
+footer > aside {
+    z-index: 30;
+}
+
+footer button {
+    background-color: rgb(0 0 0 / 60%);
+    height: 100%;
+    position: absolute;
+    left: 0;
+    z-index: inherit;
+}
+
+footer button:nth-of-type(2) {
+    right: 0;
+    left: unset;
+}
+
+footer > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: -46px;
+    right: 0;
+    background-color: rgb(0 0 0 / 80%);
+    color: white;
+    font-family: system-ui;
+    padding: 3px;
+    box-sizing: content-box;
+    user-select: none;
+    visibility: hidden;
 }
