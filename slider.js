@@ -2,7 +2,7 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'navigation']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'navigation', 'progression']
     }
 
     static OFFSET_TOUCH_X       = 100
@@ -11,7 +11,7 @@ class Carousel extends HTMLElement{
     static ATTR_SIZE            = new Set(['big','medium','small'])
     static ATTR_DRAG            = new Set(['true', 'false', ''])
     static ATTR_LOOP            = new Set(['true', 'false', ''])
-    static ATTR_NAVIGATION      = new Set(['dotted', 'preview', ''])
+    static ATTR_PROGRESSION     = new Set(['true', 'false', ''])
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -40,9 +40,9 @@ class Carousel extends HTMLElement{
     get loop(){ return this.getAttribute("loop")}
     set loop(v){ this.setAttribute("loop", v)}
     
-    // get navigation(){ return this.getAttribute("navigation")}
-    // set navigation(v){ this.setAttribute("navigation", v)}
-    
+    get loop(){ return this.getAttribute("loop")}
+    set loop(v){ this.setAttribute("loop", v)}
+     
     get index(){return this._index+1}
     get nImg(){return this._nImg}
     get lastIndex(){ return this._nImg-1}
@@ -76,6 +76,8 @@ class Carousel extends HTMLElement{
             this.enableBtnNext()
             this.enableBtnPrev()
         }
+
+        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
 
         // console.debug(`Indice ${this.index}`)
         this.updateTranslate() 
@@ -134,10 +136,15 @@ class Carousel extends HTMLElement{
             this.removeChild(img)
         })
 
+        //progression
+        this.root.progression     = document.createElement('span')
+        
+
         this.root.appendChild(this.root.header)
         this.root.appendChild(this.root.wrapper)
         this.root.appendChild(this.root.aside)
         this.root.appendChild(this.root.footer)
+        this.root.footer.appendChild(this.root.progression)
 
         //#endregion
 
@@ -239,6 +246,8 @@ class Carousel extends HTMLElement{
         if(!this._isLooped)
             this.disableBtnPrev()
 
+        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+
         this.addEventListener()
     }
 
@@ -316,16 +325,19 @@ class Carousel extends HTMLElement{
                 break               
             }
 
-            // case 'navigation':{
-            //     if(!Carousel.ATTR_NAVIGATION.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_NAVIGATION)
-            //     // debugger
-            //     this.root.footer.innerHTML = ""
+            case 'progression':{
+                if(!Carousel.ATTR_PROGRESSION.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_PROGRESSION)
 
-            //     if(newValue == 'dotted')
-            //         this.root.footer.appendChild(this._createNavigationDottedBar())
-                
-            //     break
-            // }
+                if(newValue == "true" || newValue == ""){
+                    this.root.progression.style.visibility = 'visible'
+                }
+                else if(newValue == "false"){
+                    this.root.progression.style.visibility = 'hidden'
+                }
+
+
+                break;
+            }
         }
     }
 
@@ -458,6 +470,8 @@ class CarouselDottedBar extends Carousel{
             this._dotList.push(dot)
             indexDot++
         })
+
+        this.root.footer.classList.add('extendable')
         
         this.root.footer.appendChild(wrapperDot)
     }
@@ -501,45 +515,53 @@ class CarouselPreviewBar extends Carousel{
 
     constructor(){
         super()
+
+        //#region Fields
+
+            this._previewList           = []
+            this._splitPreviews         = []
+            this._nPreviewPerSplit      = undefined
+            this._offsetPreview         = 0
+            this._indexSplitPreview     = 0
+
+        //#endregion
+
+        //#region Root
         
-        this._previewList           = []
-        this._splitPreviews          = []
-        this._nPreviewPerSplit      = undefined
-        this._offsetPreview         = 0
+            this.root.btnNextPreview = this.root.btnNext.cloneNode(true)        
+            this.root.btnPrevPreview = this.root.btnPrev.cloneNode(true)        
 
-        this.root.btnNextPreview = this.root.btnNext.cloneNode(true)        
-        this.root.btnPrevPreview = this.root.btnPrev.cloneNode(true)        
+            this.root.wrapperPreviews = document.createElement('main')
 
+            
+            let indexPreview = 1 
+            this._imgList.forEach(img=>{
 
-        this.root.wrapperPreviews = document.createElement('main')
-        
-        
-        let indexPreview = 1 
-        this._imgList.forEach(img=>{
+                let imgEl = document.createElement('div')        
+                imgEl.classList.add('preview')
 
-            let imgEl = document.createElement('div')        
-            imgEl.classList.add('preview')
+                imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
 
-            imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+                imgEl.addEventListener('click', function(el, index){
+                    // debugger
+                    this.index = index
+                    this.selectPreview(el)
 
-            imgEl.addEventListener('click', function(el, index){
-                // debugger
-                this.index = index
-                this.selectPreview(el)
+                }.bind(this, imgEl, indexPreview))
 
-            }.bind(this, imgEl, indexPreview))
+                this.root.wrapperPreviews.appendChild(imgEl)
+                this._previewList.push(imgEl)
+                indexPreview++
+            })
+                  
+            
+            this.root.footer.classList.add('extendable')
 
-            this.root.wrapperPreviews.appendChild(imgEl)
-            this._previewList.push(imgEl)
-            indexPreview++
-        })
-        
-        this._indexSplitPreview = 0
-        
+            this.root.footer.appendChild(this.root.wrapperPreviews)
+            this.root.footer.appendChild(this.root.btnPrevPreview)
+            this.root.footer.appendChild(this.root.btnNextPreview)
 
-        this.root.footer.appendChild(this.root.wrapperPreviews)
-        this.root.footer.appendChild(this.root.btnPrevPreview)
-        this.root.footer.appendChild(this.root.btnNextPreview)
+        //#endregion
     }
 
 
