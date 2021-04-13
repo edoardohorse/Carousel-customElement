@@ -48,6 +48,12 @@ Enable carousel to loop from first image to last one and viceversa.
 
 
 ---
+
+## *Progression*: (true | [false])
+
+Show a counter of n-th img showed
+
+---
 ### ⚠️ Important
 - When **small** size and **title** are setted the [header-above](#header-above-true-false) behave as *false* and [header-position](#header-position-top-bottom) is setted as *top*
 - When **small** size is setted the buttons are condensed at the bottom
@@ -82,5 +88,9 @@ Enable carousel to loop from first image to last one and viceversa.
     <carousel-dottedbar> 
         <!-- Same attribute of custom-carousel -->
     </carousel-dottedbar>
+
+    <carousel-previewbar> 
+        <!-- Same attribute of custom-carousel -->
+    </carousel-previewbar>
 
 ```
