@@ -3,7 +3,7 @@
 |name| Description|
 |----------|:-------------:|
 |*carousel-dottedbar*|Show a dotter bar that make you jump directly to a specific image
-<!-- |*carousel-previewbar*|Show a bar with all previews of the images -->
+|*carousel-previewbar*|Show a bar with all previews of the images
 
 
 ---
