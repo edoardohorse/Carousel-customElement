@@ -126,10 +126,10 @@ class Carousel extends HTMLElement{
 
             
             let div = document.createElement('div')
-            div.setAttribute('data-src', img.src)                
+            div.setAttribute('data-src', img.src.replace(location.href, "./"))                
             this.root.wrapper.appendChild(div)
 
-            div.style.backgroundImage = `url(${img.src})`
+            div.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
             
             this.removeChild(img)
         })
@@ -520,7 +520,7 @@ class CarouselPreviewBar extends Carousel{
             let imgEl = document.createElement('div')        
             imgEl.classList.add('preview')
 
-            imgEl.style.backgroundImage = `url(${img.src})`
+            imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
 
             imgEl.addEventListener('click', function(el, index){
                 // debugger
