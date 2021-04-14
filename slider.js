@@ -1,17 +1,17 @@
-
+'use strict';
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
         return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'navigation', 'progression']
     }
 
-    static OFFSET_TOUCH_X       = 100
-    static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])    // TODO settare il valore di default
-    static ATTR_HEADER_ABOVE    = new Set(['true', 'false'])    // TODO settare il valore di default
-    static ATTR_SIZE            = new Set(['big','medium','small'])
-    static ATTR_DRAG            = new Set(['true', 'false', ''])
-    static ATTR_LOOP            = new Set(['true', 'false', ''])
-    static ATTR_PROGRESSION     = new Set(['true', 'false', ''])
+    static get OFFSET_TOUCH_X(){return 100}
+    static get ATTR_HEADER_POSITION(){return new Set(['top', 'bottom'])}   // TODO settare il valore di default
+    static get ATTR_HEADER_ABOVE   (){return new Set(['true', 'false'])}   // TODO settare il valore di default
+    static get ATTR_SIZE           (){return new Set(['big','medium','small'])}
+    static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
+    static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
+    static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
