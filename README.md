@@ -1,5 +1,5 @@
 
-[Demo](https://edoardohorse.github.io/Carousel-customElement/)
+# [Demo](https://edoardohorse.github.io/Carousel-customElement/)
 
 
 # Variants
