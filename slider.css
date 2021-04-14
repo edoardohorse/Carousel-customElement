@@ -315,9 +315,14 @@ footer > span {
     visibility: hidden;
 }
 
-@media screen and (min-width:300px) {
+@media screen and (max-width: 600px) {
     
-    .preview{
-        width: var(--size-medium-preview) !important;
+    footer.extendable{
+        height: 0;
     }
+
+    footer.extendable > main,  footer.extendable > div{
+        display: none;
+    }
+
 }
