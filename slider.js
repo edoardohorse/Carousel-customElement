@@ -165,7 +165,8 @@ class Carousel extends HTMLElement{
                     // debugger
                     if(e.target != this.root.aside)
                         return e.preventDefault()
-            
+                    
+                    this._isTransitioning = false
                     this._isDragging = true
                     this._dragStartX = e.clientX
                     this._dragStartPercentage = -this._index * this._offset
@@ -176,7 +177,7 @@ class Carousel extends HTMLElement{
                 },
                 
                 onDragging : e=>{
-                    if(!this._isDragging)
+                    if(!this._isDragging || this._isTransitioning)
                         return e.preventDefault()
                     
                     this._isDragging = true
@@ -370,7 +371,7 @@ class Carousel extends HTMLElement{
         
         this.root.wrapper.addEventListener('transitionend', _=>{
             this._isTransitioning = false
-            onsole.debug('Transizione finita!')
+            console.debug('Transizione finita!')
         })
  
     }
