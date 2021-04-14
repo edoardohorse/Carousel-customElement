@@ -1,17 +1,17 @@
-
+'use strict';
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
         return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'navigation', 'progression']
     }
 
-    static OFFSET_TOUCH_X       = 100
-    static ATTR_HEADER_POSITION = new Set(['top', 'bottom'])    // TODO settare il valore di default
-    static ATTR_HEADER_ABOVE    = new Set(['true', 'false'])    // TODO settare il valore di default
-    static ATTR_SIZE            = new Set(['big','medium','small'])
-    static ATTR_DRAG            = new Set(['true', 'false', ''])
-    static ATTR_LOOP            = new Set(['true', 'false', ''])
-    static ATTR_PROGRESSION     = new Set(['true', 'false', ''])
+    static get OFFSET_TOUCH_X(){return 100}
+    static get ATTR_HEADER_POSITION(){return new Set(['top', 'bottom'])}   // TODO settare il valore di default
+    static get ATTR_HEADER_ABOVE   (){return new Set(['true', 'false'])}   // TODO settare il valore di default
+    static get ATTR_SIZE           (){return new Set(['big','medium','small'])}
+    static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
+    static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
+    static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -58,7 +58,7 @@ class Carousel extends HTMLElement{
 
 
         if(this._isTransitioning){
-            return console.debug('Transizione in corso...')
+            return console.debug('Transitioning...', this.root)
         }
 
 
@@ -79,7 +79,7 @@ class Carousel extends HTMLElement{
 
         this.root.progression.textContent = `${this._index+1}/${this._nImg}`
 
-        // console.debug(`Indice ${this.index}`)
+        // console.debug(`Indice ${this.index}`, this.root)
         this.updateTranslate() 
     }
 
@@ -165,7 +165,8 @@ class Carousel extends HTMLElement{
                     // debugger
                     if(e.target != this.root.aside)
                         return e.preventDefault()
-            
+                    
+                    this._isTransitioning = false
                     this._isDragging = true
                     this._dragStartX = e.clientX
                     this._dragStartPercentage = -this._index * this._offset
@@ -176,7 +177,7 @@ class Carousel extends HTMLElement{
                 },
                 
                 onDragging : e=>{
-                    if(!this._isDragging)
+                    if(!this._isDragging || this._isTransitioning)
                         return e.preventDefault()
                     
                     this._isDragging = true
@@ -199,7 +200,7 @@ class Carousel extends HTMLElement{
                     const offsetPercentage = this._dragOffsetX * 100/this.clientWidth
                     // sum percentage to the actual state of carousel
                     const offsetPercentageRelative =  offsetPercentage + this._dragStartPercentage
-                    // console.log(offsetPercentage)
+                    // console.debug(offsetPercentage, this.root)
                     this.root.wrapper.style.transform = `translateX(${offsetPercentageRelative}%)`
                     
                     // Conferm drag if equal/more then 30%
@@ -370,7 +371,7 @@ class Carousel extends HTMLElement{
         
         this.root.wrapper.addEventListener('transitionend', _=>{
             this._isTransitioning = false
-            onsole.debug('Transizione finita!')
+            console.debug('Transition done!', this.root)
         })
  
     }
@@ -562,6 +563,8 @@ class CarouselPreviewBar extends Carousel{
         // ensure that after the object is places into the DOM,
         // the split are calculated on TRUE sizes of div.preview
         setTimeout(this.calculateSplitPreview.bind(this),50)
+
+        this.root.addEventListener('onresize', this.calculateSplitPreview.bind(this))
     }
 
     attributeChangedCallback(name, oldValue, newValue) { 
@@ -601,7 +604,7 @@ class CarouselPreviewBar extends Carousel{
     }
 
     calculateSplitPreview(){
-
+        console.debug('Calculeted split preview', this.root)
         this._splitPreviews                              = []
         // debugger
         const widthImg                                  = this._previewList[0].offsetWidth  // 75

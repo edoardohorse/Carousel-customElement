@@ -7,7 +7,7 @@
     --size-medium: 350px;
     --size-small: 150px;
     --size-big-preview: 150px;
-    --size-medium-preview: 75px;
+    --size-medium-preview: 70px;
     --transition-slide-duration: 300ms;
     --navigation-preview-opacity: 1;
     --cubic-bezier-material: cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -250,7 +250,7 @@ footer > main .preview {
     transition: transform 150ms;
 }
 
-footer > main .preview.selected {
+footer.extendable > main .preview.selected {
     border: 2px solid red;
     box-sizing: border-box;
     transform: scale(0.98);
@@ -313,4 +313,16 @@ footer > span {
     box-sizing: content-box;
     user-select: none;
     visibility: hidden;
+}
+
+@media screen and (max-width: 600px) {
+    
+    footer.extendable{
+        height: 0;
+    }
+
+    footer.extendable > main,  footer.extendable > div{
+        display: none;
+    }
+
 }
