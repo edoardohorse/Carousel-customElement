@@ -1,3 +1,7 @@
+
+[Demo](https://edoardohorse.github.io/Carousel-customElement/)
+
+
 # Variants
     
 |name| Description|
