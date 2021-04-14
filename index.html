@@ -4,6 +4,12 @@
         <meta http-equiv="cache-control" content="no-cache">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
+    <style>
+        carousel-dottedbar, custom-carousel, carousel-previewbar{
+            margin: auto;
+            margin-top: 5em;
+        }
+    </style>
     <body>
 
         <carousel-dottedbar width=300 height=200 drag loop>
@@ -12,7 +18,7 @@
             <img src="./img/3.jpg">
         </carousel-dottedbar>
         
-        <carousel-previewbar  drag loop width=500 height=500>
+        <carousel-previewbar  drag loop width=500 height=500 drag=false progression>
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">

@@ -160,9 +160,9 @@ class Carousel extends HTMLElement{
             this._isDraggable       = false
             this._isDragging        = false
             this._commitDrag        = false
-            this._events            = new Map()
             this._eventsDrag        = {
                 onDragStart : e=>{
+                    // debugger
                     if(e.target != this.root.aside)
                         return e.preventDefault()
             
@@ -194,16 +194,16 @@ class Carousel extends HTMLElement{
                     }
                     
                     
-                    
-                    // Misuro l'offset dal primo tocco in percentuale alla larghezza dell'elemento
+                    // debugger
+                    // Calculate the offset from first touch as a percetange of element's width
                     const offsetPercentage = this._dragOffsetX * 100/this.clientWidth
-                    // sommo a questo lo stato attuale del carousel
+                    // sum percentage to the actual state of carousel
                     const offsetPercentageRelative =  offsetPercentage + this._dragStartPercentage
-                                
+                    // console.log(offsetPercentage)
                     this.root.wrapper.style.transform = `translateX(${offsetPercentageRelative}%)`
                     
-                    // Confermo il drag se uguale/maggiore del 50%
-                    if(Math.abs(offsetPercentage) >= 50)
+                    // Conferm drag if equal/more then 30%
+                    if(Math.abs(offsetPercentage) >= 30)
                         this._commitDrag = true
                     
                 },
@@ -355,38 +355,24 @@ class Carousel extends HTMLElement{
                 
         //     }
         // })
-        
+
         
         this.root.aside.addEventListener('touchstart', e=>{
-            log('Touchstart')
-            this._touchOffsetX = 0
-            this._touchStartX = e.touches[0].pageX   
+            this._eventsDrag.onDragStart(e.touches[0])
         })
-        
-            
         this.root.aside.addEventListener('touchmove', e=>{
+            this._eventsDrag.onDragging(e.touches[0])
+        })
 
-                this._touchOffsetX = e.touches[0].pageX - this._touchStartX;
-                
-                if( Math.abs(this._touchOffsetX) < Carousel.OFFSET_TOUCH_X ){return}
-
-                // Vai a sinistra (scroll sinistra -> destra)
-                if(this._touchOffsetX >= 0){              
-                    // hijacked
-                    this.goPrev()                
-                    return
-                }
-                // Altrimenti vai a destra (scroll sinistra <- destra)
-                this.goNext()
-
+        this.root.aside.addEventListener('touchend', e=>{
+            this._eventsDrag.onMouseUp(e.touches[0])
         })
         
-
         this.root.wrapper.addEventListener('transitionend', _=>{
             this._isTransitioning = false
-            console.debug('Transizione finita!')
+            onsole.debug('Transizione finita!')
         })
-        
+ 
     }
     
 
