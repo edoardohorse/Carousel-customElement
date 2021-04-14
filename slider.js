@@ -58,7 +58,7 @@ class Carousel extends HTMLElement{
 
 
         if(this._isTransitioning){
-            return console.debug('Transizione in corso...')
+            return console.debug('Transitioning...', this.root)
         }
 
 
@@ -79,7 +79,7 @@ class Carousel extends HTMLElement{
 
         this.root.progression.textContent = `${this._index+1}/${this._nImg}`
 
-        // console.debug(`Indice ${this.index}`)
+        // console.debug(`Indice ${this.index}`, this.root)
         this.updateTranslate() 
     }
 
@@ -200,7 +200,7 @@ class Carousel extends HTMLElement{
                     const offsetPercentage = this._dragOffsetX * 100/this.clientWidth
                     // sum percentage to the actual state of carousel
                     const offsetPercentageRelative =  offsetPercentage + this._dragStartPercentage
-                    // console.log(offsetPercentage)
+                    // console.debug(offsetPercentage, this.root)
                     this.root.wrapper.style.transform = `translateX(${offsetPercentageRelative}%)`
                     
                     // Conferm drag if equal/more then 30%
@@ -371,7 +371,7 @@ class Carousel extends HTMLElement{
         
         this.root.wrapper.addEventListener('transitionend', _=>{
             this._isTransitioning = false
-            console.debug('Transizione finita!')
+            console.debug('Transition done!', this.root)
         })
  
     }
@@ -563,6 +563,8 @@ class CarouselPreviewBar extends Carousel{
         // ensure that after the object is places into the DOM,
         // the split are calculated on TRUE sizes of div.preview
         setTimeout(this.calculateSplitPreview.bind(this),50)
+
+        this.root.addEventListener('onresize', this.calculateSplitPreview.bind(this))
     }
 
     attributeChangedCallback(name, oldValue, newValue) { 
@@ -602,7 +604,7 @@ class CarouselPreviewBar extends Carousel{
     }
 
     calculateSplitPreview(){
-
+        console.debug('Calculeted split preview', this.root)
         this._splitPreviews                              = []
         // debugger
         const widthImg                                  = this._previewList[0].offsetWidth  // 75
