@@ -11,6 +11,7 @@
     --carousel-transition-slide-duration: 300ms;
     --carousel-navigation-preview-opacity: 1;
     --carousel-cubic-bezier-material: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --carousel-font-size-progression: 12px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -301,18 +302,17 @@ footer > span {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
     position: absolute;
-    top: -46px;
+    top: -2.3em;
     right: 0;
     background-color: rgb(0 0 0 / 80%);
     color: white;
     font-family: system-ui;
-    padding: 3px;
     box-sizing: content-box;
     user-select: none;
     visibility: hidden;
+    padding: 0.5em;
+    font-size: var(--carousel-font-size-progression);
 }
 
 @media screen and (max-width: 600px) {

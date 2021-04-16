@@ -102,6 +102,7 @@ Show a counter of n-th img showed
 |carousel-transition-slide-duration|300ms|
 |carousel-navigation-preview-opacity|1|
 |carousel-cubic-bezier-material|cubic-bezier(0.4, 0.0, 0.2, 1)|
+|carousel-font-size-progression|12px|
 |carousel-size-width-custom|setted via [width](#width-height) attribute|
 |carousel-size-height-custom|setted via [height](#width-height) attribute|
 
