@@ -5,29 +5,60 @@
 # Variants
     
 |name| Description|
-|----------|:-------------:|
+|----------|-------------|
 |*carousel-dottedbar*|Show a dotter bar that make you jump directly to a specific image
 |*carousel-previewbar*|Show a bar with all previews of the images
 
+# Syntax
 
----
+```html
+    <carousel-default
+        size= big|[medium]|small 
+        
+        width=[350] height=[350]
+
+        title = "Title"
+        subtitle = "Subtitle"
+        
+        header-position = [top]|bottom
+        header-above = [true]|false
+        
+        drag = true|[false]]
+        loop = true|[false]]
+        
+        progression = true|[false]>
+
+            <img src='img/foo.jpg'>
+            <img src='img/foo2.jpg'>
+            <img src='img/foo3.jpg'>
+    </carousel-default>
+```
+
+```html
+    <carousel-dottedbar> 
+        <!-- Same attribute of carousel-default -->
+    </carousel-dottedbar>
+
+    <carousel-previewbar> 
+        <!-- Same attribute of carousel-default -->
+    </carousel-previewbar>
+
+```
+
 
 
 ## Title & Subtitle: *string*
 Give a title and a subtitle to the carousel
 
----
-
 ## Header
 
-### *header-position*: ([top] | bottom)
+#### header-position: ([top] | bottom)
 Header can be positioned **bottom** or **top** (default)
 
-### *header-above*: ([true] | false)
+#### header-above: ([true] | false)
 
 Header can lay above the images (z-Index greater) or make its own space.
 
----
 
 ## Size: (big | [medium] | small)  
 |Value attribute| size
@@ -36,30 +67,26 @@ Header can lay above the images (z-Index greater) or make its own space.
 |medium|350x350 px|
 |small|150x150 px|
 
-Custom size can be setted by **width** and **height** attribute
+#### Width & Height
 
----
+Custom size can be setted by **width** and **height** attributes
 
-## *Drag*: (true | [false])
+
+## Drag: (true | [false])
 
 Make the swipe available with mouse. 
 
----
-
-## *Loop*: (true | [false])
+## Loop: (true | [false])
 
 Enable carousel to loop from first image to last one and viceversa.
 
 
----
-
-## *Progression*: (true | [false])
+## Progression: (true | [false])
 
 Show a counter of n-th img showed
 
----
 
-### CSS Variables
+## CSS Variables
 
 |Name|Default value
 |-|:-:|
@@ -77,6 +104,22 @@ Show a counter of n-th img showed
 |carousel-cubic-bezier-material|cubic-bezier(0.4, 0.0, 0.2, 1)|
 |carousel-size-width-custom|setted via [width](#width-height) attribute|
 |carousel-size-height-custom|setted via [height](#width-height) attribute|
+
+
+## Responsivness
+
+Best way to get a responsive carousel
+
+```css
+@media screen and (max-width:600px) {
+    carousel-dottedbar, carousel-default, carousel-previewbar{
+        --size-width-custom: 100% !important;
+        --size-height-custom: 70vw !important;
+    }
+}
+```
+
+
 ---
 
 
@@ -84,39 +127,6 @@ Show a counter of n-th img showed
 - When **small** size and **title** are setted the [header-above](#header-above-true-false) behave as *false* and [header-position](#header-position-top-bottom) is setted as *top*
 - When **small** size is setted the buttons are condensed at the bottom
 - When **subtitle** is not setted the header is less height
-- When **navigation** is setted to *preview* <u>and</u> [size](#size) is *small*, bar it's not showed
+- When display's width is less then 600px, **previews** are not shown in carousel-previewbar
 
 ---
-
-
-# Complete syntax
-
-```html
-    <custom-carousel
-        size='big|[medium]|small' or width='[350px]' height='[350px]'
-
-        title='Title'
-        subtitle='Subtitle'
-        
-        header-position='[top]|bottom'
-        header-above='[true]|false'
-        
-        drag = 'true|[false]']
-        loop = 'true|[false]']>
-
-            <img src='img/foo.jpg'>
-            <img src='img/foo2.jpg'>
-            <img src='img/foo3.jpg'>
-    </custom-carousel>
-```
-
-```html
-    <carousel-dottedbar> 
-        <!-- Same attribute of custom-carousel -->
-    </carousel-dottedbar>
-
-    <carousel-previewbar> 
-        <!-- Same attribute of custom-carousel -->
-    </carousel-previewbar>
-
-```

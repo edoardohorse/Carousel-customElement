@@ -686,6 +686,6 @@ class CarouselPreviewBar extends Carousel{
 
 
     
-customElements.define('custom-carousel', Carousel)
+customElements.define('carousel-default', Carousel)
 customElements.define('carousel-dottedbar', CarouselDottedBar)
 customElements.define('carousel-previewbar', CarouselPreviewBar)

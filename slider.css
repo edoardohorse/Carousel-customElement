@@ -326,3 +326,10 @@ footer > span {
     }
 
 }
+
+/*@media screen and (max-width:600px) {
+    :host{
+        --carousel-size-width-custom: 100% !important;
+        --carousel-size-height-custom: 70vw !important;
+    }
+}*/
