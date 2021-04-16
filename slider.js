@@ -359,14 +359,18 @@ class Carousel extends HTMLElement{
 
         
         this.root.aside.addEventListener('touchstart', e=>{
-            this._eventsDrag.onDragStart(e.touches[0])
+            if(e.touches[0].target != this.root.aside) return 
+            e.clientX = e.touches[0].clientX
+            this._eventsDrag.onDragStart(e)
         })
         this.root.aside.addEventListener('touchmove', e=>{
-            this._eventsDrag.onDragging(e.touches[0])
+            if(e.touches[0].target != this.root.aside) return 
+            e.clientX = e.touches[0].clientX
+            this._eventsDrag.onDragging(e)
         })
 
         this.root.aside.addEventListener('touchend', e=>{
-            this._eventsDrag.onMouseUp(e.touches[0])
+            this._eventsDrag.onMouseUp(e)
         })
         
         this.root.wrapper.addEventListener('transitionend', _=>{
