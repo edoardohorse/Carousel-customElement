@@ -49,6 +49,11 @@
     bottom: 0;
 }
 
+:host(carousel-dotted[header-position='bottom']) > header,
+:host(carousel-preview[header-position='bottom']) > header{
+    visibility: hidden;
+}
+
 :host(:not([title])) > header {
     display: none;
 }

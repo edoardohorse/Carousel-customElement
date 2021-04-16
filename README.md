@@ -129,5 +129,6 @@ Best way to get a responsive carousel
 - When **small** size is setted the buttons are condensed at the bottom
 - When **subtitle** is not setted the header is less height
 - When display's width is less then 600px, **previews** are not shown in carousel-preview
+- When **title** is setted and placed to the *bottom* in carousel-preview/dotted, it's not showed
 
 ---
