@@ -58,6 +58,28 @@ Enable carousel to loop from first image to last one and viceversa.
 Show a counter of n-th img showed
 
 ---
+
+### CSS Variables
+
+|Name|Default value
+|-|:-:|
+|carousel-btn-bg|rgba(0,0,0,.75)|
+|carousel-btn-color|white|
+|carousel-title-font-size|27px|
+|carousel-subtitle-font-size|17px|
+|carousel-size-big| 500px|
+|carousel-size-medium| 350px|
+|carousel-size-small| 150px|
+|carousel-size-big-preview|150px|
+|carousel-size-medium-preview|70px|
+|carousel-transition-slide-duration|300ms|
+|carousel-navigation-preview-opacity|1|
+|carousel-cubic-bezier-material|cubic-bezier(0.4, 0.0, 0.2, 1)|
+|carousel-size-width-custom|setted via [width](#width-height) attribute|
+|carousel-size-height-custom|setted via [height](#width-height) attribute|
+---
+
+
 ### ⚠️ Important
 - When **small** size and **title** are setted the [header-above](#header-above-true-false) behave as *false* and [header-position](#header-position-top-bottom) is setted as *top*
 - When **small** size is setted the buttons are condensed at the bottom
