@@ -6,8 +6,8 @@
     
 |name| Description|
 |----------|-------------|
-|*carousel-dottedbar*|Show a dotter bar that make you jump directly to a specific image
-|*carousel-previewbar*|Show a bar with all previews of the images
+|*carousel-dotted*|Show a dotter bar that make you jump directly to a specific image
+|*carousel-preview*|Show a bar with all previews of the images
 
 # Syntax
 
@@ -35,13 +35,13 @@
 ```
 
 ```html
-    <carousel-dottedbar> 
+    <carousel-dotted> 
         <!-- Same attribute of carousel-default -->
-    </carousel-dottedbar>
+    </carousel-dotted>
 
-    <carousel-previewbar> 
+    <carousel-preview> 
         <!-- Same attribute of carousel-default -->
-    </carousel-previewbar>
+    </carousel-preview>
 
 ```
 
@@ -113,7 +113,7 @@ Best way to get a responsive carousel
 
 ```css
 @media screen and (max-width:600px) {
-    carousel-dottedbar, carousel-default, carousel-previewbar{
+    carousel-default, carousel-dotted, carousel-preview{
         --size-width-custom: 100% !important;
         --size-height-custom: 70vw !important;
     }
@@ -128,6 +128,6 @@ Best way to get a responsive carousel
 - When **small** size and **title** are setted the [header-above](#header-above-true-false) behave as *false* and [header-position](#header-position-top-bottom) is setted as *top*
 - When **small** size is setted the buttons are condensed at the bottom
 - When **subtitle** is not setted the header is less height
-- When display's width is less then 600px, **previews** are not shown in carousel-previewbar
+- When display's width is less then 600px, **previews** are not shown in carousel-preview
 
 ---

@@ -426,7 +426,7 @@ class Carousel extends HTMLElement{
 }
 
 
-class CarouselDottedBar extends Carousel{
+class CarouselDotted extends Carousel{
     static get observedAttributes(){
         return Carousel.observedAttributes
     }
@@ -492,7 +492,7 @@ class CarouselDottedBar extends Carousel{
 
 }
 
-class CarouselPreviewBar extends Carousel{
+class CarouselPreview extends Carousel{
     static get observedAttributes(){
         return Carousel.observedAttributes
     }
@@ -691,5 +691,5 @@ class CarouselPreviewBar extends Carousel{
 
     
 customElements.define('carousel-default', Carousel)
-customElements.define('carousel-dottedbar', CarouselDottedBar)
-customElements.define('carousel-previewbar', CarouselPreviewBar)
+customElements.define('carousel-dotted', CarouselDotted)
+customElements.define('carousel-preview', CarouselPreview)
