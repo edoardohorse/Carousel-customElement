@@ -6,8 +6,8 @@ class Carousel extends HTMLElement{
     }
 
     static get OFFSET_TOUCH_X(){return 100}
-    static get ATTR_HEADER_POSITION(){return new Set(['top', 'bottom'])}   // TODO settare il valore di default
-    static get ATTR_HEADER_ABOVE   (){return new Set(['true', 'false'])}   // TODO settare il valore di default
+    static get ATTR_HEADER_POSITION(){return new Set(['top', 'bottom', ''])}
+    static get ATTR_HEADER_ABOVE   (){return new Set(['true', 'false', ''])}
     static get ATTR_SIZE           (){return new Set(['big','medium','small'])}
     static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
