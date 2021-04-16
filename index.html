@@ -5,13 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <style>
-        carousel-dottedbar, custom-carousel, carousel-previewbar{
+        carousel-dotted, carousel-default, carousel-preview{
             margin: auto;
             margin-top: 5em;
         }
 
-        @media screen and (max-width:600px) {
-            carousel-dottedbar, custom-carousel, carousel-previewbar{
+       @media screen and (max-width:600px) {
+            carousel-dotted, carousel-default, carousel-preview{
                 --size-width-custom: 100% !important;
                 --size-height-custom: 70vw !important;
             }
@@ -19,13 +19,13 @@
     </style>
     <body>
 
-        <carousel-dottedbar width=300 height=200 drag loop>
+        <carousel-dotted width=300 height=200 drag loop>
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">
-        </carousel-dottedbar>
+        </carousel-dotted>
         
-        <carousel-previewbar loop width=640 height=480 drag=false progression preview=show>
+        <carousel-preview loop width=640 height=480 drag=false progression title=prova header-position=bottom>
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">
@@ -33,21 +33,21 @@
             <img src="./img/5.jpg">
             <img src="./img/6.jpg">
             <img src="./img/7.jpg">
-        </carousel-previewbar>
+        </carousel-preview>
         
-        <!-- <custom-carousel width=300 height=200 drag loop navigation="dotted">
+        <!-- <carousel-default width=300 height=200 drag loop navigation="dotted">
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">
-        </custom-carousel> -->
+        </carousel-default> -->
 
         
         
-        <custom-carousel title='Intestazione' width=400 loop=false>
+        <carousel-default title='Intestazione' width=400 loop=false>
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">
-        </custom-carousel>
+        </carousel-default>
 
         <div id='log'>
 

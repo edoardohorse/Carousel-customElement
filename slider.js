@@ -2,12 +2,12 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'navigation', 'progression']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'progression']
     }
 
     static get OFFSET_TOUCH_X(){return 100}
-    static get ATTR_HEADER_POSITION(){return new Set(['top', 'bottom'])}   // TODO settare il valore di default
-    static get ATTR_HEADER_ABOVE   (){return new Set(['true', 'false'])}   // TODO settare il valore di default
+    static get ATTR_HEADER_POSITION(){return new Set(['top', 'bottom', ''])}
+    static get ATTR_HEADER_ABOVE   (){return new Set(['true', 'false', ''])}
     static get ATTR_SIZE           (){return new Set(['big','medium','small'])}
     static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
@@ -285,18 +285,18 @@ class Carousel extends HTMLElement{
 
             case 'width':{
                 if(newValue)
-                    this.style.setProperty('--size-width-custom', newValue+'px');
+                    this.style.setProperty('--carousel-size-width-custom', newValue+'px');
                 else
-                    this.style.removeProperty('--size-width-custom')
+                    this.style.removeProperty('--carousel-size-width-custom')
 
                 break
             }
             
             case 'height':{
                 if(newValue)
-                    this.style.setProperty('--size-height-custom', newValue+'px');
+                    this.style.setProperty('--carousel-size-height-custom', newValue+'px');
                 else
-                    this.style.removeProperty('--size-height-custom')
+                    this.style.removeProperty('--carousel-size-height-custom')
                 break
             }
 
@@ -359,14 +359,18 @@ class Carousel extends HTMLElement{
 
         
         this.root.aside.addEventListener('touchstart', e=>{
-            this._eventsDrag.onDragStart(e.touches[0])
+            if(e.touches[0].target != this.root.aside) return 
+            e.clientX = e.touches[0].clientX
+            this._eventsDrag.onDragStart(e)
         })
         this.root.aside.addEventListener('touchmove', e=>{
-            this._eventsDrag.onDragging(e.touches[0])
+            if(e.touches[0].target != this.root.aside) return 
+            e.clientX = e.touches[0].clientX
+            this._eventsDrag.onDragging(e)
         })
 
         this.root.aside.addEventListener('touchend', e=>{
-            this._eventsDrag.onMouseUp(e.touches[0])
+            this._eventsDrag.onMouseUp(e)
         })
         
         this.root.wrapper.addEventListener('transitionend', _=>{
@@ -422,7 +426,7 @@ class Carousel extends HTMLElement{
 }
 
 
-class CarouselDottedBar extends Carousel{
+class CarouselDotted extends Carousel{
     static get observedAttributes(){
         return Carousel.observedAttributes
     }
@@ -488,7 +492,7 @@ class CarouselDottedBar extends Carousel{
 
 }
 
-class CarouselPreviewBar extends Carousel{
+class CarouselPreview extends Carousel{
     static get observedAttributes(){
         return Carousel.observedAttributes
     }
@@ -686,6 +690,6 @@ class CarouselPreviewBar extends Carousel{
 
 
     
-customElements.define('custom-carousel', Carousel)
-customElements.define('carousel-dottedbar', CarouselDottedBar)
-customElements.define('carousel-previewbar', CarouselPreviewBar)
+customElements.define('carousel-default', Carousel)
+customElements.define('carousel-dotted', CarouselDotted)
+customElements.define('carousel-preview', CarouselPreview)
