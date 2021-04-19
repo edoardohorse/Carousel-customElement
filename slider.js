@@ -405,6 +405,11 @@ class Carousel extends HTMLElement{
         this.root.aside.addEventListener('touchend', e=>{
             this._eventsDrag.onMouseUp(e)
         })
+
+        this.root.wrapper.addEventListener('transitionstart', _=>{
+            this._isTransitioning = true
+            console.debug('Transition start!', this.root)
+        })
         
         this.root.wrapper.addEventListener('transitionend', _=>{
             this._isTransitioning = false
@@ -431,7 +436,6 @@ class Carousel extends HTMLElement{
     }
     
     updateTranslate(){
-        this._isTransitioning = true
         this.root.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
     }
 
@@ -612,9 +616,9 @@ class CarouselPreview extends Carousel{
 
         // ensure that after the object is places into the DOM,
         // the split are calculated on TRUE sizes of div.preview
-        setTimeout(this.calculateSplitPreview.bind(this),50)
+        this.calculateSplitPreview(50)
 
-        window.addEventListener('resize', debounce(function(){this.calculateSplitPreview()}.bind(this),1000))
+        window.addEventListener('resize', debounce(function(){this.calculateSplitPreview()}.bind(this),500))
     }
 
     attributeChangedCallback(name, oldValue, newValue) { 
@@ -622,7 +626,7 @@ class CarouselPreview extends Carousel{
         
         // if any of these attributes change, recalculate the splits
         if(['size','width','height'].includes(name)){
-            debounce(function(){this.calculateSplitPreview()}.bind(this),1000)
+            debounce(function(){this.calculateSplitPreview()}.bind(this),500)
         }
     }
 
@@ -636,7 +640,7 @@ class CarouselPreview extends Carousel{
     }
 
     selectPreview(preview){
-
+        debugger
         this._previewSelected.classList.remove('selected')
         this._previewSelected = preview
         this._previewSelected.classList.add('selected')
