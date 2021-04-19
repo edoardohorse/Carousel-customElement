@@ -106,7 +106,7 @@ class Carousel extends HTMLElement{
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
-        this.root.style.setAttribute('href','slider.css')
+        this.root.style.setAttribute('href','carousel.css')
         
         this.root.styleFullscreen.setAttribute('rel','stylesheet')
         this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
