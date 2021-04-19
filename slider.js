@@ -2,7 +2,7 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'progression']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'progression', 'fullscreen']
     }
 
     static get OFFSET_TOUCH_X(){return 100}
@@ -12,6 +12,7 @@ class Carousel extends HTMLElement{
     static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
     static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
+    static get ATTR_FULLSCREEN     (){return new Set(['true', 'false',''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -42,6 +43,9 @@ class Carousel extends HTMLElement{
     
     get progression(){ return this.getAttribute("progression")}
     set progression(v){ this.setAttribute("progression", v)}
+    
+    get fullscreen(){ return this.getAttribute("fullscreen")}
+    set fullscreen(v){ this.setAttribute("fullscreen", v)}
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -87,12 +91,16 @@ class Carousel extends HTMLElement{
         super()
 
         //#region Root
-        this.root           = this.attachShadow({mode: 'open'})
-        this.root.wrapper   = document.createElement('main')    // zIndex: 5
-        this.root.header    = document.createElement('header')  // zIndex: 10
-        this.root.aside    = document.createElement('aside')  // zIndex: 15
-        this.root.footer    = document.createElement('footer')  // zIndex: 20
-        this.root.style     = document.createElement('link')
+        this.root               = this.attachShadow({mode: 'open'})
+        this.root.wrapper       = document.createElement('main')    // zIndex: 5
+        this.root.header        = document.createElement('header')  // zIndex: 10
+        this.root.aside         = document.createElement('aside')   // zIndex: 15
+        this.root.footer        = document.createElement('footer')  // zIndex: 20
+        this.root.fullscreenEl  = document.createElement('i')       //zIndex:  30
+        this.root.style         = document.createElement('link')
+
+        //icon fullscreen
+        this.root.fullscreenEl.innerHTML = '&#10530;'
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
@@ -140,6 +148,7 @@ class Carousel extends HTMLElement{
         this.root.progression     = document.createElement('span')
         
 
+        this.root.appendChild(this.root.fullscreenEl)
         this.root.appendChild(this.root.header)
         this.root.appendChild(this.root.wrapper)
         this.root.appendChild(this.root.aside)
@@ -156,6 +165,7 @@ class Carousel extends HTMLElement{
             this._nImg              = this.root.wrapper.childElementCount
             this._imgList           = imgs
             this._isLooped          = false
+            this._isFullscreen      = false
             this._isTransitioning   = false
             this._isDraggable       = false
             this._isDragging        = false
@@ -339,6 +349,20 @@ class Carousel extends HTMLElement{
 
                 break;
             }
+            
+            case 'fullscreen':{
+                if(!Carousel.ATTR_FULLSCREEN.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_FULLSCREEN)
+
+                if(newValue == "enabled"){
+                    // this.root.progression.style.visibility = 'visible' // TODO
+                }
+                else if(newValue == "disabled"){
+                    // this.root.progression.style.visibility = 'hidden' // TODO
+                }
+
+
+                break;
+            }
         }
     }
 
@@ -348,6 +372,8 @@ class Carousel extends HTMLElement{
 
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
         this.root.btnPrev.addEventListener('click', this.goPrev.bind(this), false)
+
+        this.root.fullscreenElement.addEventListener('click', this.goFullscreen.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -422,6 +448,14 @@ class Carousel extends HTMLElement{
         this.index--
     }
 
+    goFullscreen(){
+        this._isFullscreen = true
+
+    }
+
+    closeFullscreen(){
+        this._isFullscreen = false
+    }
     //#endregion
 }
 

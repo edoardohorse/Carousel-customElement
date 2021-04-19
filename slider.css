@@ -82,6 +82,29 @@
     cursor: default;
 }
 
+i{
+    display: none;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    right: 0px;
+    width: 30px;
+    height: 30px;
+    padding: .2em;
+    color: white;
+    font-size: 20px;
+    text-shadow: 1px 1px 2px rgb(0 0 0 / 100%);
+    cursor: zoom-in;
+    z-index: 30;
+    font-weight: bolder;
+    user-select: none;
+}
+
+:host([fullscreen]) > i{
+    display: flex;
+}
+
 header {
     display: flex;
     flex-direction: column;
