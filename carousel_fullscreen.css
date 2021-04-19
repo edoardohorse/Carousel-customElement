@@ -1,0 +1,28 @@
+:host([fullscreen]) {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+
+:host([fullscreen]) > main > * {
+    background-size: auto;
+}
+
+:host([fullscreen]) > aside button {
+    width: 50px;
+    height: 75px;
+    font-size: 40px;
+    border: 1px solid rgb(250 250 250 / 20%);
+}
+
+:host([fullscreen]) > footer.extendable {
+    transition: none;
+    transform: translateY(0);
+    height: 100px;
+}
+
+:host([fullscreen]) > footer > div ol{
+    height: 15px;
+    width: 15px;
+}

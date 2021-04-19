@@ -1,4 +1,5 @@
 'use strict';
+
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
@@ -12,7 +13,7 @@ class Carousel extends HTMLElement{
     static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
     static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
-    static get ATTR_FULLSCREEN     (){return new Set(['true', 'false',''])}
+    static get ATTR_FULLSCREEN     (){return new Set(['opened', 'closed',''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -98,15 +99,21 @@ class Carousel extends HTMLElement{
         this.root.footer        = document.createElement('footer')  // zIndex: 20
         this.root.fullscreenEl  = document.createElement('i')       //zIndex:  30
         this.root.style         = document.createElement('link')
+        this.root.styleFullscreen= document.createElement('link')
 
         //icon fullscreen
-        this.root.fullscreenEl.innerHTML = '&#10530;'
+        // this.root.fullscreenEl.innerHTML = '&#10530;'
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
         this.root.style.setAttribute('href','slider.css')
+        
+        this.root.styleFullscreen.setAttribute('rel','stylesheet')
+        this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
+        this.root.styleFullscreen.disabled = true
 
         this.root.appendChild(this.root.style)
+        this.root.appendChild(this.root.styleFullscreen)
 
         // header
         this.root.titleEl = document.createElement('span')
@@ -352,12 +359,12 @@ class Carousel extends HTMLElement{
             
             case 'fullscreen':{
                 if(!Carousel.ATTR_FULLSCREEN.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_FULLSCREEN)
-
-                if(newValue == "enabled"){
-                    // this.root.progression.style.visibility = 'visible' // TODO
+                
+                if(newValue == "opened"){
+                    this.root.styleFullscreen.disabled = !(this._isFullscreen = true)
                 }
-                else if(newValue == "disabled"){
-                    // this.root.progression.style.visibility = 'hidden' // TODO
+                else if(newValue == "closed" || newValue == ""){
+                    this.root.styleFullscreen.disabled = !(this._isFullscreen = false)
                 }
 
 
@@ -373,7 +380,7 @@ class Carousel extends HTMLElement{
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
         this.root.btnPrev.addEventListener('click', this.goPrev.bind(this), false)
 
-        this.root.fullscreenElement.addEventListener('click', this.goFullscreen.bind(this), false)
+        this.root.fullscreenEl.addEventListener('click', this.toggleFullscreen.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -448,13 +455,18 @@ class Carousel extends HTMLElement{
         this.index--
     }
 
-    goFullscreen(){
-        this._isFullscreen = true
-
+    openFullscreen(){
+        this.fullscreen = 'opened'
+        console.debug('Fullscreen opened',this.root)
     }
 
     closeFullscreen(){
-        this._isFullscreen = false
+        this.fullscreen = 'closed'
+        console.debug('Fullscreen closed',this.root)
+    }
+
+    toggleFullscreen(){
+        this._isFullscreen? this.closeFullscreen(): this.openFullscreen();
     }
     //#endregion
 }
@@ -716,6 +728,18 @@ class CarouselPreview extends Carousel{
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
     
+    openFullscreen(){
+        super.openFullscreen()
+
+        setTimeout(this.calculateSplitPreview.bind(this),50)
+    }
+
+    closeFullscreen(){
+        super.closeFullscreen()
+
+        setTimeout(this.calculateSplitPreview.bind(this),50)
+    }
+
     //#endregion
 
     

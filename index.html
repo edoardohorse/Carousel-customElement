@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <style>
+        body{margin:0;}
         carousel-dotted, carousel-default, carousel-preview{
             margin: auto;
             margin-top: 5em;
@@ -19,13 +20,15 @@
     </style>
     <body>
 
-        <carousel-dotted width=300 height=200 drag loop>
+        
+
+        <carousel-dotted width=300 height=200 drag loop fullscreen>
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">
         </carousel-dotted>
         
-        <carousel-preview loop width=640 height=480 drag=false progression title=prova header-position=bottom>
+        <carousel-preview loop width=640 height=480 drag=false progression title=prova header-position=bottom fullscreen>
             <img src="./img/1.jpg">
             <img src="./img/2.jpg">
             <img src="./img/3.jpg">
