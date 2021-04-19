@@ -622,7 +622,7 @@ class CarouselPreview extends Carousel{
         
         // if any of these attributes change, recalculate the splits
         if(['size','width','height'].includes(name)){
-            this.calculateSplitPreview()
+            debounce(function(){this.calculateSplitPreview()}.bind(this),1000)
         }
     }
 
@@ -655,7 +655,8 @@ class CarouselPreview extends Carousel{
 
     calculateSplitPreview(timer = 0){
         let calculate = _=>{
-            console.debug('Calculeted split preview', this.root)
+            console.group('Calculation splits', this.root)
+            console.debug('Calculeted split preview')
             this._splitPreviews                              = []
             // debugger
             const widthImg                                  = this._previewList[0].offsetWidth  // 75
@@ -674,6 +675,17 @@ class CarouselPreview extends Carousel{
                                                             // 3,526.. => 3
             this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
             
+            // if no split is needed
+            if(this._nPreviewPerSplit >= this._nImg){
+                /*[0, 0, 0, 0, 0, 0, 0]*/
+                console.debug('No split needed',this.root)
+                console.table(this._splitPreviews)
+                this._splitPreviews = this._previewList.slice(0, this._previewList.length).map(x=>{return 0})
+                this._indexSplitPreview = 0
+                // update the position of the first split (the only one). No need to continue the calculation of split
+                console.groupEnd()
+                return this.updateTranslate()
+            }
             
             /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
             // ↑ 1° split     ↑ 2° split                        ↑ 3° split
@@ -681,7 +693,7 @@ class CarouselPreview extends Carousel{
             //           [preview per split] ↑       [deviation] ↑                         ↑
             //           [n preview of last split less the one showed thanks to deviation] ↑
             for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
-                // per each split index set the offset to left
+                // per each split index set the offset to the left
                 let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
                                 x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
                                 )
@@ -700,6 +712,12 @@ class CarouselPreview extends Carousel{
 
                 this._splitPreviews = this._splitPreviews.concat(slice)
             }
+
+            // update the position of the split selected. Useful when fullscreen mode is closed,
+            // and from one split (the only needed), became more then 1 splits
+            this.updateTranslate()
+            console.table(this._splitPreviews)
+            console.groupEnd()
         }
 
         setTimeout(calculate.bind(this), timer)
