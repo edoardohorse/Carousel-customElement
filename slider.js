@@ -614,7 +614,7 @@ class CarouselPreview extends Carousel{
         // the split are calculated on TRUE sizes of div.preview
         setTimeout(this.calculateSplitPreview.bind(this),50)
 
-        this.root.addEventListener('onresize', this.calculateSplitPreview.bind(this))
+        window.addEventListener('resize', debounce(function(){this.calculateSplitPreview()}.bind(this),1000))
     }
 
     attributeChangedCallback(name, oldValue, newValue) { 
@@ -653,52 +653,56 @@ class CarouselPreview extends Carousel{
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
 
-    calculateSplitPreview(){
-        console.debug('Calculeted split preview', this.root)
-        this._splitPreviews                              = []
-        // debugger
-        const widthImg                                  = this._previewList[0].offsetWidth  // 75
+    calculateSplitPreview(timer = 0){
+        let calculate = _=>{
+            console.debug('Calculeted split preview', this.root)
+            this._splitPreviews                              = []
+            // debugger
+            const widthImg                                  = this._previewList[0].offsetWidth  // 75
 
-                                                        // (595 - (75 * 7) ) / 7 => 10px [5px marginLeft + 5px marginRight]
-        const offsetMarginPreview                       = (this.root.wrapperPreviews.clientWidth - ( widthImg* this._nImg) ) / this._nImg 
-       
-                                                        //  350 - 50 [width btnPrevPreview + width btnNextPreview]) / ( 75 + 10 )  => 3,529..
-        const nPreviewVisiblePerSplit                   = (this.root.footer.clientWidth - (this.root.btnNextPreview.clientWidth + this.root.btnPrevPreview.clientWidth) ) / 
-                                                            (widthImg + offsetMarginPreview)
-
-                                                        // (4 [3,529.. => 4] - 3.529..) * 75 => 35.29... [px remaining to last img to be showed entirely]
-                                                        // 3 img showed entirely + 39.705px [75px - 35.29px] of next img 
-        const deviationPixelToNextPreviewOfNextSplit    = (Math.ceil(nPreviewVisiblePerSplit) - nPreviewVisiblePerSplit) * widthImg
-
-                                                        // 3,526.. => 3
-        this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
+                                                            // (595 - (75 * 7) ) / 7 => 10px [5px marginLeft + 5px marginRight]
+            const offsetMarginPreview                       = (this.root.wrapperPreviews.clientWidth - ( widthImg* this._nImg) ) / this._nImg 
         
-        
-        /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
-        // ↑ 1° split     ↑ 2° split                        ↑ 3° split
-        //    0px        (75px + 10px) * 3       255px + 35.29px  + (75px + 10px) * (2 - 1)
-        //           [preview per split] ↑       [deviation] ↑                         ↑
-        //           [n preview of last split less the one showed thanks to deviation] ↑
-        for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
-            // per each split index set the offset to left
-            let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
-                            x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
-                            )
+                                                            //  350 - 50 [width btnPrevPreview + width btnNextPreview]) / ( 75 + 10 )  => 3,529..
+            const nPreviewVisiblePerSplit                   = (this.root.footer.clientWidth - (this.root.btnNextPreview.clientWidth + this.root.btnPrevPreview.clientWidth) ) / 
+                                                                (widthImg + offsetMarginPreview)
+
+                                                            // (4 [3,529.. => 4] - 3.529..) * 75 => 35.29... [px remaining to last img to be showed entirely]
+                                                            // 3 img showed entirely + 39.705px [75px - 35.29px] of next img 
+            const deviationPixelToNextPreviewOfNextSplit    = (Math.ceil(nPreviewVisiblePerSplit) - nPreviewVisiblePerSplit) * widthImg
+
+                                                            // 3,526.. => 3
+            this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
             
-            // if it's last split, calculate how many pixel remains to show last preview
-            // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
-            if( i+this._nPreviewPerSplit >= this._nImg){
+            
+            /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
+            // ↑ 1° split     ↑ 2° split                        ↑ 3° split
+            //    0px        (75px + 10px) * 3       255px + 35.29px  + (75px + 10px) * (2 - 1)
+            //           [preview per split] ↑       [deviation] ↑                         ↑
+            //           [n preview of last split less the one showed thanks to deviation] ↑
+            for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
+                // per each split index set the offset to left
+                let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
+                                x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
+                                )
                 
-                let lastSplit = 
-                    this._splitPreviews[this._splitPreviews.length-1] + deviationPixelToNextPreviewOfNextSplit +
-                        ((widthImg + offsetMarginPreview) * (slice.length-1))
+                // if it's last split, calculate how many pixel remains to show last preview
+                // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
+                if( i+this._nPreviewPerSplit >= this._nImg){
+                    
+                    let lastSplit = 
+                        this._splitPreviews[this._splitPreviews.length-1] + deviationPixelToNextPreviewOfNextSplit +
+                            ((widthImg + offsetMarginPreview) * (slice.length-1))
 
-                for( let lastIndex in slice)
-                    slice[lastIndex] = lastSplit
+                    for( let lastIndex in slice)
+                        slice[lastIndex] = lastSplit
+                }
+
+                this._splitPreviews = this._splitPreviews.concat(slice)
             }
-
-            this._splitPreviews = this._splitPreviews.concat(slice)
         }
+
+        setTimeout(calculate.bind(this), timer)
     }
 
     //#endregion
@@ -731,13 +735,13 @@ class CarouselPreview extends Carousel{
     openFullscreen(){
         super.openFullscreen()
 
-        setTimeout(this.calculateSplitPreview.bind(this),50)
+        this.calculateSplitPreview(100)
     }
 
     closeFullscreen(){
         super.closeFullscreen()
 
-        setTimeout(this.calculateSplitPreview.bind(this),50)
+        this.calculateSplitPreview(100)
     }
 
     //#endregion
@@ -745,6 +749,21 @@ class CarouselPreview extends Carousel{
     
 
 }
+
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
 
 
     
