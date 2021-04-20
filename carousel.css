@@ -20,6 +20,7 @@
     box-shadow: 0px 0px 5px -2px rgb(0 0 0);
     box-sizing: border-box;
     overflow: hidden;
+    background-color: rgb(33 33 33);
 }
 
 :host([size='big']) {
@@ -82,6 +83,42 @@
     cursor: default;
 }
 
+i{
+    display: none;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    right: 0px;
+    width: 30px;
+    height: 30px;
+    padding: .2em;
+    color: white;
+    font-size: 20px;
+    text-shadow: 1px 1px 2px rgb(0 0 0 / 100%);
+    z-index: 30;
+    font-weight: bolder;
+    user-select: none;
+    font-style: normal;
+}
+
+
+:host([fullscreen]) > i{
+    display: flex;
+}
+
+:host([fullscreen]) > i:after{
+    display: block;
+    content:"\2922";
+    cursor: zoom-in;
+}
+
+:host([fullscreen='opened']) > i:after{
+    display: block;
+    content:"\2716";    
+    cursor: zoom-out;
+}
+
 header {
     display: flex;
     flex-direction: column;
@@ -128,13 +165,13 @@ header > span:last-child {
 
 main {
     display: flex;
-    /* order: 2; */
     flex-grow: 1;
     flex-flow: row nowrap;
     will-change: transform;
     transition: transform var(--carousel-transition-slide-duration);
     transition-timing-function: var(--carousel-cubic-bezier-material);
     z-index: 5;
+    /* background-color: rgb(33 33 33); */
 }
 
 main.dragged {
@@ -154,6 +191,7 @@ main > * {
     background-repeat: no-repeat;
     background-size: cover;
     user-select: none;
+    /* box-shadow: 0 0 0px 0 white; */
 }
 
 aside {
@@ -169,7 +207,6 @@ aside {
 
 button {
     width: 25px;
-    line-height: 25px;
     height: 50px;
     background-color: rgb(0 0 0 / 40%);
     text-align: center;
@@ -178,7 +215,7 @@ button {
     user-select: none;
     font-size: 20px;
     transition: opacity 150ms;
-    border: 1px solid rgb(152 152 152 / 50%);
+    border: 1px solid rgb(250 250 250 / 20%);
 }
 
 :host([size='small']) button {
@@ -195,13 +232,17 @@ button:disabled {
     cursor: not-allowed;
 }
 
+
+footer button:disabled {
+    visibility: hidden;
+}
+
 footer {
     position: absolute;
     width: 100%;
     display: flex;
     bottom: 0;
     z-index: 20;
-    
     box-sizing: border-box;
     opacity: var(--carousel-navigation-preview-opacity);
     background-color: rgb(0 0 0 / 40%);
@@ -212,25 +253,25 @@ footer.extendable{
     height: 20%;
     transform: translateY(100%);
     transition: transform 300ms var(--carousel-cubic-bezier-material);
-    transition-delay: 1s;
+    /* transition-delay: 1s; */
     will-change: transform;
 }
 
 aside:hover ~ footer.extendable,
 footer.extendable:hover{
     transform: translateY(0%);
-    transition-delay: 0s;
+    transition-delay: 100ms;
 }
 
 footer > div {
     position: relative;
     height: 100%;
     display: flex;
+    flex-direction: row;
     align-items: center;
 }
 
 footer > div ol {
-    float: left;
     width: 12px;
     height: 12px;
     padding: 0;
@@ -322,12 +363,13 @@ footer > span {
 
 @media screen and (max-width: 600px) {
     
-    footer.extendable{
+    :host(carousel-preview) footer.extendable{
         height: 0;
     }
 
-    footer.extendable > main,  footer.extendable > div{
-        display: none;
+    :host(carousel-preview) footer.extendable > main, 
+    :host(carousel-preview) footer.extendable > div{
+        visibility: hidden;
     }
 
 }

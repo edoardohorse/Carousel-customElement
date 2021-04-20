@@ -26,7 +26,9 @@
         drag = true|[false]]
         loop = true|[false]]
         
-        progression = true|[false]>
+        progression = true|[false]
+        
+        fullscreen = true|[false]>
 
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
@@ -84,6 +86,10 @@ Enable carousel to loop from first image to last one and viceversa.
 ## Progression: (true | [false])
 
 Show a counter of n-th img showed
+
+## Fullscreen: (true | [false])
+
+Make the carousel big as its parent
 
 
 ## CSS Variables

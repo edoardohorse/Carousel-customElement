@@ -1,8 +1,9 @@
 'use strict';
+
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'progression']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'progression', 'fullscreen']
     }
 
     static get OFFSET_TOUCH_X(){return 100}
@@ -12,6 +13,7 @@ class Carousel extends HTMLElement{
     static get ATTR_DRAG           (){return new Set(['true', 'false', ''])}
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
     static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
+    static get ATTR_FULLSCREEN     (){return new Set(['opened', 'closed',''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -42,6 +44,9 @@ class Carousel extends HTMLElement{
     
     get progression(){ return this.getAttribute("progression")}
     set progression(v){ this.setAttribute("progression", v)}
+    
+    get fullscreen(){ return this.getAttribute("fullscreen")}
+    set fullscreen(v){ this.setAttribute("fullscreen", v)}
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -87,18 +92,28 @@ class Carousel extends HTMLElement{
         super()
 
         //#region Root
-        this.root           = this.attachShadow({mode: 'open'})
-        this.root.wrapper   = document.createElement('main')    // zIndex: 5
-        this.root.header    = document.createElement('header')  // zIndex: 10
-        this.root.aside    = document.createElement('aside')  // zIndex: 15
-        this.root.footer    = document.createElement('footer')  // zIndex: 20
-        this.root.style     = document.createElement('link')
+        this.root               = this.attachShadow({mode: 'open'})
+        this.root.wrapper       = document.createElement('main')    // zIndex: 5
+        this.root.header        = document.createElement('header')  // zIndex: 10
+        this.root.aside         = document.createElement('aside')   // zIndex: 15
+        this.root.footer        = document.createElement('footer')  // zIndex: 20
+        this.root.fullscreenEl  = document.createElement('i')       //zIndex:  30
+        this.root.style         = document.createElement('link')
+        this.root.styleFullscreen= document.createElement('link')
+
+        //icon fullscreen
+        // this.root.fullscreenEl.innerHTML = '&#10530;'
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
-        this.root.style.setAttribute('href','slider.css')
+        this.root.style.setAttribute('href','carousel.css')
+        
+        this.root.styleFullscreen.setAttribute('rel','stylesheet')
+        this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
+        this.root.styleFullscreen.disabled = true
 
         this.root.appendChild(this.root.style)
+        this.root.appendChild(this.root.styleFullscreen)
 
         // header
         this.root.titleEl = document.createElement('span')
@@ -140,6 +155,7 @@ class Carousel extends HTMLElement{
         this.root.progression     = document.createElement('span')
         
 
+        this.root.appendChild(this.root.fullscreenEl)
         this.root.appendChild(this.root.header)
         this.root.appendChild(this.root.wrapper)
         this.root.appendChild(this.root.aside)
@@ -156,6 +172,7 @@ class Carousel extends HTMLElement{
             this._nImg              = this.root.wrapper.childElementCount
             this._imgList           = imgs
             this._isLooped          = false
+            this._isFullscreen      = false
             this._isTransitioning   = false
             this._isDraggable       = false
             this._isDragging        = false
@@ -339,6 +356,20 @@ class Carousel extends HTMLElement{
 
                 break;
             }
+            
+            case 'fullscreen':{
+                if(!Carousel.ATTR_FULLSCREEN.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_FULLSCREEN)
+                
+                if(newValue == "opened"){
+                    this.root.styleFullscreen.disabled = !(this._isFullscreen = true)
+                }
+                else if(newValue == "closed" || newValue == ""){
+                    this.root.styleFullscreen.disabled = !(this._isFullscreen = false)
+                }
+
+
+                break;
+            }
         }
     }
 
@@ -348,6 +379,8 @@ class Carousel extends HTMLElement{
 
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
         this.root.btnPrev.addEventListener('click', this.goPrev.bind(this), false)
+
+        this.root.fullscreenEl.addEventListener('click', this.toggleFullscreen.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -371,6 +404,11 @@ class Carousel extends HTMLElement{
 
         this.root.aside.addEventListener('touchend', e=>{
             this._eventsDrag.onMouseUp(e)
+        })
+
+        this.root.wrapper.addEventListener('transitionstart', _=>{
+            this._isTransitioning = true
+            console.debug('Transition start!', this.root)
         })
         
         this.root.wrapper.addEventListener('transitionend', _=>{
@@ -398,7 +436,6 @@ class Carousel extends HTMLElement{
     }
     
     updateTranslate(){
-        this._isTransitioning = true
         this.root.wrapper.style.transform = `translateX(-${this._index * this._offset}%)`
     }
 
@@ -422,6 +459,19 @@ class Carousel extends HTMLElement{
         this.index--
     }
 
+    openFullscreen(){
+        this.fullscreen = 'opened'
+        console.debug('Fullscreen opened',this.root)
+    }
+
+    closeFullscreen(){
+        this.fullscreen = 'closed'
+        console.debug('Fullscreen closed',this.root)
+    }
+
+    toggleFullscreen(){
+        this._isFullscreen? this.closeFullscreen(): this.openFullscreen();
+    }
     //#endregion
 }
 
@@ -566,9 +616,9 @@ class CarouselPreview extends Carousel{
 
         // ensure that after the object is places into the DOM,
         // the split are calculated on TRUE sizes of div.preview
-        setTimeout(this.calculateSplitPreview.bind(this),50)
+        this.calculateSplitPreview(50)
 
-        this.root.addEventListener('onresize', this.calculateSplitPreview.bind(this))
+        window.addEventListener('resize', debounce(function(){this.calculateSplitPreview()}.bind(this),500))
     }
 
     attributeChangedCallback(name, oldValue, newValue) { 
@@ -576,7 +626,7 @@ class CarouselPreview extends Carousel{
         
         // if any of these attributes change, recalculate the splits
         if(['size','width','height'].includes(name)){
-            this.calculateSplitPreview()
+            debounce(function(){this.calculateSplitPreview()}.bind(this),500)
         }
     }
 
@@ -590,7 +640,6 @@ class CarouselPreview extends Carousel{
     }
 
     selectPreview(preview){
-
         this._previewSelected.classList.remove('selected')
         this._previewSelected = preview
         this._previewSelected.classList.add('selected')
@@ -600,59 +649,115 @@ class CarouselPreview extends Carousel{
     updateTranslate(){
         super.updateTranslate()
         
-        this._offsetPreview = this._splitPreviews[this._index]
-        
-        this._indexSplitPreview = this._index
+        // debugger
+        this._offsetPreview = this._splitPreviews.get(this._index).offsetToIndexSplit
+        this._indexSplitPreview = this._splitPreviews.get(this._index).indexSplit
 
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
 
-    calculateSplitPreview(){
-        console.debug('Calculeted split preview', this.root)
-        this._splitPreviews                              = []
-        // debugger
-        const widthImg                                  = this._previewList[0].offsetWidth  // 75
+    calculateSplitPreview(timer = 0){
+        let calculate = _=>{
 
-                                                        // (595 - (75 * 7) ) / 7 => 10px [5px marginLeft + 5px marginRight]
-        const offsetMarginPreview                       = (this.root.wrapperPreviews.clientWidth - ( widthImg* this._nImg) ) / this._nImg 
-       
-                                                        //  350 - 50 [width btnPrevPreview + width btnNextPreview]) / ( 75 + 10 )  => 3,529..
-        const nPreviewVisiblePerSplit                   = (this.root.footer.clientWidth - (this.root.btnNextPreview.clientWidth + this.root.btnPrevPreview.clientWidth) ) / 
-                                                            (widthImg + offsetMarginPreview)
+            console.group('Calculation splits', this.root)
+            console.debug('Calculeted split preview')
+            this._splitPreviews                              = new Map()
+            // debugger
+            const widthImg                                  = this._previewList[0].offsetWidth  // 75
 
-                                                        // (4 [3,529.. => 4] - 3.529..) * 75 => 35.29... [px remaining to last img to be showed entirely]
-                                                        // 3 img showed entirely + 39.705px [75px - 35.29px] of next img 
-        const deviationPixelToNextPreviewOfNextSplit    = (Math.ceil(nPreviewVisiblePerSplit) - nPreviewVisiblePerSplit) * widthImg
-
-                                                        // 3,526.. => 3
-        this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
+                                                            // (595 - (75 * 7) ) / 7 => 10px [5px marginLeft + 5px marginRight]
+            const offsetMarginPreview                       = (this.root.wrapperPreviews.clientWidth - ( widthImg* this._nImg) ) / this._nImg 
         
-        
-        /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
-        // ↑ 1° split     ↑ 2° split                        ↑ 3° split
-        //    0px        (75px + 10px) * 3       255px + 35.29px  + (75px + 10px) * (2 - 1)
-        //           [preview per split] ↑       [deviation] ↑                         ↑
-        //           [n preview of last split less the one showed thanks to deviation] ↑
-        for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
-            // per each split index set the offset to left
-            let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
-                            x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
-                            )
+                                                            //  350 - 50 [width btnPrevPreview + width btnNextPreview]) / ( 75 + 10 )  => 3,529..
+            const nPreviewVisiblePerSplit                   = (this.root.footer.clientWidth - (this.root.btnNextPreview.clientWidth + this.root.btnPrevPreview.clientWidth) ) / 
+                                                                (widthImg + offsetMarginPreview)
+
+                                                            // (4 [3,529.. => 4] - 3.529..) * 75 => 35.29... [px remaining to last img to be showed entirely]
+                                                            // 3 img showed entirely + 39.705px [75px - 35.29px] of next img 
+            const deviationPixelToNextPreviewOfNextSplit    = (Math.ceil(nPreviewVisiblePerSplit) - nPreviewVisiblePerSplit) * widthImg
+
+                                                            // 3,526.. => 3
+            this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
+
+            let lastSplit = 0
+
+           /*  if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
+                debugger
+            } */
             
-            // if it's last split, calculate how many pixel remains to show last preview
-            // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
-            if( i+this._nPreviewPerSplit >= this._nImg){
-                
-                let lastSplit = 
-                    this._splitPreviews[this._splitPreviews.length-1] + deviationPixelToNextPreviewOfNextSplit +
-                        ((widthImg + offsetMarginPreview) * (slice.length-1))
+            // if no split is needed → [0, 0, 0, 0, 0, 0, 0]
+            if(this._nPreviewPerSplit >= this._nImg){
 
-                for( let lastIndex in slice)
-                    slice[lastIndex] = lastSplit
+                this.hideBtnNextPrevPreviews()
+
+                console.debug('No split needed',this.root)
+                
+                this._splitPreviews = new Map()
+                this._previewList.slice(0, this._previewList.length).map(x=>{ 
+                        this._splitPreviews.set( this._previewList.indexOf(x) ,
+                                                    {   'indexSplit':0,
+                                                        'offsetToIndexSplit':0
+                                                    })
+                                                })
+                
+                this._indexSplitPreview = 0
+                
+            }
+            else{
+
+                this.showBtnNextPrevPreviews()
+            
+                /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
+                // ↑ 1° split     ↑ 2° split                        ↑ 3° split
+                //    0px        (75px + 10px) * 3       255px + 35.29px  + (75px + 10px) * (2 - 1)
+                //           [preview per split] ↑       [deviation] ↑                         ↑
+                //           [n preview of last split less the one showed thanks to deviation] ↑
+                for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
+                    // per each split index set the offset to the left
+                    // debugger
+                    let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
+                                    x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
+                                    )
+                    
+
+                    // if it's last split, calculate how many pixel remains to show last preview
+                    // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
+                    if( i+this._nPreviewPerSplit >= this._nImg){
+                        
+                        let lastSplitOffset = 
+                            this._splitPreviews.get(this._splitPreviews.size-1).offsetToIndexSplit + deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview +
+                            ((widthImg + offsetMarginPreview) * (slice.length-1)) 
+
+                        for( let lastIndex in slice)
+                            slice[lastIndex] = lastSplitOffset
+
+                        lastSplit = i
+                    }
+
+                    // this._splitPreviews = this._splitPreviews.concat(slice)
+                    var j = i
+                    for(let offset of slice){
+                        this._splitPreviews.set(j,{
+                            'indexSplit': i,
+                            'offsetToIndexSplit': offset
+                        })
+                        j++
+                    }
+
+                    
+                }
             }
 
-            this._splitPreviews = this._splitPreviews.concat(slice)
+            this._splitPreviews.set('lastSplit', lastSplit)
+
+            // update the position of the split selected. Useful when fullscreen mode is closed,
+            // and from one split (the only needed), became more then 1 splits
+            this.updateTranslate()
+            console.table(Object.fromEntries(this._splitPreviews))
+            console.groupEnd()
         }
+
+        setTimeout(calculate.bind(this), timer)
     }
 
     //#endregion
@@ -661,32 +766,63 @@ class CarouselPreview extends Carousel{
 
     goPrevPreview(){
         if(this._indexSplitPreview == 0 )
-            this._indexSplitPreview = this._splitPreviews.length-1
+            this._indexSplitPreview = this._splitPreviews.get('lastSplit')
         else
             this._indexSplitPreview -= this._nPreviewPerSplit
         
-        this._offsetPreview = this._splitPreviews[this._indexSplitPreview]
+        this._offsetPreview = this._splitPreviews.get(this._indexSplitPreview).offsetToIndexSplit
         
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
 
     goNextPreview(){
         
-        if(this._indexSplitPreview + this._nPreviewPerSplit >= this._splitPreviews.length)
+        if(this._indexSplitPreview == this._splitPreviews.get('lastSplit'))
             this._indexSplitPreview = 0
         else
             this._indexSplitPreview += this._nPreviewPerSplit
         
-        this._offsetPreview = this._splitPreviews[this._indexSplitPreview]
+        this._offsetPreview = this._splitPreviews.get(this._indexSplitPreview).offsetToIndexSplit
 
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
     
+    openFullscreen(){
+        super.openFullscreen()
+
+        this.calculateSplitPreview(100)
+    }
+
+    closeFullscreen(){
+        super.closeFullscreen()
+
+        this.calculateSplitPreview(100)
+    }
+
+    showBtnNextPrevPreviews(){ this.root.btnNextPreview.disabled = this.root.btnPrevPreview.disabled = false  }
+    hideBtnNextPrevPreviews(){ this.root.btnNextPreview.disabled = this.root.btnPrevPreview.disabled = true  }
+
+
     //#endregion
 
     
 
 }
+
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
 
 
     
