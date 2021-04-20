@@ -659,8 +659,6 @@ class CarouselPreview extends Carousel{
     calculateSplitPreview(timer = 0){
         let calculate = _=>{
 
-            this.showBtnNextPrevPreviews()
-
             console.group('Calculation splits', this.root)
             console.debug('Calculeted split preview')
             this._splitPreviews                              = new Map()
@@ -681,6 +679,8 @@ class CarouselPreview extends Carousel{
                                                             // 3,526.. => 3
             this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
 
+            let lastSplit = 0
+
             if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
                 debugger
             }
@@ -691,7 +691,7 @@ class CarouselPreview extends Carousel{
                 this.hideBtnNextPrevPreviews()
 
                 console.debug('No split needed',this.root)
-                console.table(Object.fromEntries(this._splitPreviews))
+                
                 this._splitPreviews = new Map()
                 this._previewList.slice(0, this._previewList.length).map(x=>{ 
                         this._splitPreviews.set( this._previewList.indexOf(x) ,
@@ -699,50 +699,56 @@ class CarouselPreview extends Carousel{
                                                         'offsetToIndexSplit':0
                                                     })
                                                 })
-
-                this._indexSplitPreview = 0
-                console.groupEnd()
-
-
-                // update the position of the first split (the only one). No need to continue the calculation of split
-                return this.updateTranslate()
-            }
-            
-            /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
-            // ↑ 1° split     ↑ 2° split                        ↑ 3° split
-            //    0px        (75px + 10px) * 3       255px + 35.29px  + (75px + 10px) * (2 - 1)
-            //           [preview per split] ↑       [deviation] ↑                         ↑
-            //           [n preview of last split less the one showed thanks to deviation] ↑
-            for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
-                // per each split index set the offset to the left
-                // debugger
-                let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
-                                x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
-                                )
                 
+                this._indexSplitPreview = 0
+                
+            }
+            else{
 
-                // if it's last split, calculate how many pixel remains to show last preview
-                // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
-                if( i+this._nPreviewPerSplit >= this._nImg){
+                this.showBtnNextPrevPreviews()
+            
+                /*[0, 0, 0,      255, 255, 255,     375.29411764705884, 375.29411764705884]*/
+                // ↑ 1° split     ↑ 2° split                        ↑ 3° split
+                //    0px        (75px + 10px) * 3       255px + 35.29px  + (75px + 10px) * (2 - 1)
+                //           [preview per split] ↑       [deviation] ↑                         ↑
+                //           [n preview of last split less the one showed thanks to deviation] ↑
+                for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
+                    // per each split index set the offset to the left
+                    // debugger
+                    let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
+                                    x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
+                                    )
                     
-                    let lastSplit = 
-                        this._splitPreviews.get(this._splitPreviews.size-1).offsetToIndexSplit + deviationPixelToNextPreviewOfNextSplit +
-                            (widthImg * (slice.length-1)) + offsetMarginPreview
 
-                    for( let lastIndex in slice)
-                        slice[lastIndex] = lastSplit
-                }
+                    // if it's last split, calculate how many pixel remains to show last preview
+                    // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
+                    if( i+this._nPreviewPerSplit >= this._nImg){
+                        
+                        let lastSplitOffset = 
+                            this._splitPreviews.get(this._splitPreviews.size-1).offsetToIndexSplit + deviationPixelToNextPreviewOfNextSplit +
+                                (widthImg * (slice.length-1)) + offsetMarginPreview
 
-                // this._splitPreviews = this._splitPreviews.concat(slice)
-                var j = i
-                for(let offset of slice){
-                    this._splitPreviews.set(j,{
-                        'indexSplit': i,
-                        'offsetToIndexSplit': offset
-                    })
-                    j++
+                        for( let lastIndex in slice)
+                            slice[lastIndex] = lastSplitOffset
+
+                        lastSplit = i
+                    }
+
+                    // this._splitPreviews = this._splitPreviews.concat(slice)
+                    var j = i
+                    for(let offset of slice){
+                        this._splitPreviews.set(j,{
+                            'indexSplit': i,
+                            'offsetToIndexSplit': offset
+                        })
+                        j++
+                    }
+
+                    
                 }
             }
+
+            this._splitPreviews.set('lastSplit', lastSplit)
 
             // update the position of the split selected. Useful when fullscreen mode is closed,
             // and from one split (the only needed), became more then 1 splits
@@ -760,7 +766,7 @@ class CarouselPreview extends Carousel{
 
     goPrevPreview(){
         if(this._indexSplitPreview == 0 )
-            this._indexSplitPreview = this._splitPreviews.size-1
+            this._indexSplitPreview = this._splitPreviews.get('lastSplit')
         else
             this._indexSplitPreview -= this._nPreviewPerSplit
         
@@ -771,7 +777,7 @@ class CarouselPreview extends Carousel{
 
     goNextPreview(){
         
-        if(this._indexSplitPreview + this._nPreviewPerSplit >= this._splitPreviews.size)
+        if(this._indexSplitPreview == this._splitPreviews.get('lastSplit'))
             this._indexSplitPreview = 0
         else
             this._indexSplitPreview += this._nPreviewPerSplit
