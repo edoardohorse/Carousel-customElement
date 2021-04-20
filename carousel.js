@@ -681,9 +681,9 @@ class CarouselPreview extends Carousel{
 
             let lastSplit = 0
 
-            if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
-                debugger
-            }
+            // if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
+            //     debugger
+            // }
             
             // if no split is needed → [0, 0, 0, 0, 0, 0, 0]
             if(this._nPreviewPerSplit >= this._nImg){
@@ -725,8 +725,8 @@ class CarouselPreview extends Carousel{
                     if( i+this._nPreviewPerSplit >= this._nImg){
                         
                         let lastSplitOffset = 
-                            this._splitPreviews.get(this._splitPreviews.size-1).offsetToIndexSplit + deviationPixelToNextPreviewOfNextSplit +
-                                (widthImg * (slice.length-1)) + offsetMarginPreview
+                            this._splitPreviews.get(this._splitPreviews.size-1).offsetToIndexSplit + deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview +
+                            ((widthImg + offsetMarginPreview) * (slice.length-1)) 
 
                         for( let lastIndex in slice)
                             slice[lastIndex] = lastSplitOffset
