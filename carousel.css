@@ -363,12 +363,13 @@ footer > span {
 
 @media screen and (max-width: 600px) {
     
-    footer.extendable{
+    :host(carousel-preview) footer.extendable{
         height: 0;
     }
 
-    footer.extendable > main,  footer.extendable > div{
-        display: none;
+    :host(carousel-preview) footer.extendable > main, 
+    :host(carousel-preview) footer.extendable > div{
+        visibility: hidden;
     }
 
 }

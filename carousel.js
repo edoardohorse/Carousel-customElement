@@ -681,9 +681,9 @@ class CarouselPreview extends Carousel{
 
             let lastSplit = 0
 
-            // if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
-            //     debugger
-            // }
+           /*  if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
+                debugger
+            } */
             
             // if no split is needed → [0, 0, 0, 0, 0, 0, 0]
             if(this._nPreviewPerSplit >= this._nImg){

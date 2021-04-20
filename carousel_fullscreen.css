@@ -30,3 +30,13 @@
     height: 15px;
     width: 15px;
 }
+
+@media screen and (max-width: 600px) {
+    
+    :host(carousel-preview[fullscreen='opened']) footer.extendable > main,
+    :host(carousel-preview[fullscreen='opened']) footer.extendable > div{
+        visibility: visible;
+    }
+
+}
+
