@@ -640,7 +640,6 @@ class CarouselPreview extends Carousel{
     }
 
     selectPreview(preview){
-        debugger
         this._previewSelected.classList.remove('selected')
         this._previewSelected = preview
         this._previewSelected.classList.add('selected')
@@ -650,18 +649,21 @@ class CarouselPreview extends Carousel{
     updateTranslate(){
         super.updateTranslate()
         
-        this._offsetPreview = this._splitPreviews[this._index]
-        
-        this._indexSplitPreview = this._index
+        // debugger
+        this._offsetPreview = this._splitPreviews.get(this._index).offsetToIndexSplit
+        this._indexSplitPreview = this._splitPreviews.get(this._index).indexSplit
 
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
 
     calculateSplitPreview(timer = 0){
         let calculate = _=>{
+
+            this.showBtnNextPrevPreviews()
+
             console.group('Calculation splits', this.root)
             console.debug('Calculeted split preview')
-            this._splitPreviews                              = []
+            this._splitPreviews                              = new Map()
             // debugger
             const widthImg                                  = this._previewList[0].offsetWidth  // 75
 
@@ -678,16 +680,31 @@ class CarouselPreview extends Carousel{
 
                                                             // 3,526.. => 3
             this._nPreviewPerSplit                          = Math.floor(nPreviewVisiblePerSplit)
+
+            if(deviationPixelToNextPreviewOfNextSplit + offsetMarginPreview > widthImg){
+                debugger
+            }
             
-            // if no split is needed
+            // if no split is needed → [0, 0, 0, 0, 0, 0, 0]
             if(this._nPreviewPerSplit >= this._nImg){
-                /*[0, 0, 0, 0, 0, 0, 0]*/
+
+                this.hideBtnNextPrevPreviews()
+
                 console.debug('No split needed',this.root)
-                console.table(this._splitPreviews)
-                this._splitPreviews = this._previewList.slice(0, this._previewList.length).map(x=>{return 0})
+                console.table(Object.fromEntries(this._splitPreviews))
+                this._splitPreviews = new Map()
+                this._previewList.slice(0, this._previewList.length).map(x=>{ 
+                        this._splitPreviews.set( this._previewList.indexOf(x) ,
+                                                    {   'indexSplit':0,
+                                                        'offsetToIndexSplit':0
+                                                    })
+                                                })
+
                 this._indexSplitPreview = 0
-                // update the position of the first split (the only one). No need to continue the calculation of split
                 console.groupEnd()
+
+
+                // update the position of the first split (the only one). No need to continue the calculation of split
                 return this.updateTranslate()
             }
             
@@ -698,29 +715,39 @@ class CarouselPreview extends Carousel{
             //           [n preview of last split less the one showed thanks to deviation] ↑
             for(let i = 0; i < this._nImg; i+=this._nPreviewPerSplit){
                 // per each split index set the offset to the left
+                // debugger
                 let slice = this._previewList.slice(i, i+this._nPreviewPerSplit).map(
                                 x=>{return this._previewList[i].offsetLeft - (offsetMarginPreview/2)}
                                 )
                 
+
                 // if it's last split, calculate how many pixel remains to show last preview
                 // in such a way that wrapperPreview it's aligned [0px distance] to btnNextPreview
                 if( i+this._nPreviewPerSplit >= this._nImg){
                     
                     let lastSplit = 
-                        this._splitPreviews[this._splitPreviews.length-1] + deviationPixelToNextPreviewOfNextSplit +
-                            ((widthImg + offsetMarginPreview) * (slice.length-1))
+                        this._splitPreviews.get(this._splitPreviews.size-1).offsetToIndexSplit + deviationPixelToNextPreviewOfNextSplit +
+                            (widthImg * (slice.length-1)) + offsetMarginPreview
 
                     for( let lastIndex in slice)
                         slice[lastIndex] = lastSplit
                 }
 
-                this._splitPreviews = this._splitPreviews.concat(slice)
+                // this._splitPreviews = this._splitPreviews.concat(slice)
+                var j = i
+                for(let offset of slice){
+                    this._splitPreviews.set(j,{
+                        'indexSplit': i,
+                        'offsetToIndexSplit': offset
+                    })
+                    j++
+                }
             }
 
             // update the position of the split selected. Useful when fullscreen mode is closed,
             // and from one split (the only needed), became more then 1 splits
             this.updateTranslate()
-            console.table(this._splitPreviews)
+            console.table(Object.fromEntries(this._splitPreviews))
             console.groupEnd()
         }
 
@@ -733,23 +760,23 @@ class CarouselPreview extends Carousel{
 
     goPrevPreview(){
         if(this._indexSplitPreview == 0 )
-            this._indexSplitPreview = this._splitPreviews.length-1
+            this._indexSplitPreview = this._splitPreviews.size-1
         else
             this._indexSplitPreview -= this._nPreviewPerSplit
         
-        this._offsetPreview = this._splitPreviews[this._indexSplitPreview]
+        this._offsetPreview = this._splitPreviews.get(this._indexSplitPreview).offsetToIndexSplit
         
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
 
     goNextPreview(){
         
-        if(this._indexSplitPreview + this._nPreviewPerSplit >= this._splitPreviews.length)
+        if(this._indexSplitPreview + this._nPreviewPerSplit >= this._splitPreviews.size)
             this._indexSplitPreview = 0
         else
             this._indexSplitPreview += this._nPreviewPerSplit
         
-        this._offsetPreview = this._splitPreviews[this._indexSplitPreview]
+        this._offsetPreview = this._splitPreviews.get(this._indexSplitPreview).offsetToIndexSplit
 
         this.root.wrapperPreviews.style.transform = `translateX(-${ this._offsetPreview }px)`
     }
@@ -765,6 +792,10 @@ class CarouselPreview extends Carousel{
 
         this.calculateSplitPreview(100)
     }
+
+    showBtnNextPrevPreviews(){ this.root.btnNextPreview.disabled = this.root.btnPrevPreview.disabled = false  }
+    hideBtnNextPrevPreviews(){ this.root.btnNextPreview.disabled = this.root.btnPrevPreview.disabled = true  }
+
 
     //#endregion
 

@@ -232,6 +232,11 @@ button:disabled {
     cursor: not-allowed;
 }
 
+
+footer button:disabled {
+    visibility: hidden;
+}
+
 footer {
     position: absolute;
     width: 100%;
