@@ -28,7 +28,9 @@
         
         progression = true|[false]
         
-        fullscreen = true|[false]>
+        fullscreen = true|[false]
+        
+        timer = seconds>
 
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
@@ -91,6 +93,10 @@ Show a counter of n-th img showed
 
 Make the carousel big as its parent
 
+
+## Timer: seconds
+
+Set a timer of how many seconds the carousel will go next img automatically 
 
 ## CSS Variables
 

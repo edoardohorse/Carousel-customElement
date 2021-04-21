@@ -3,7 +3,8 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'width', 'height', 'drag', 'loop', 'progression', 'fullscreen']
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size',
+                'width', 'height', 'drag', 'loop', 'progression', 'fullscreen', 'timer']
     }
 
     static get OFFSET_TOUCH_X(){return 100}
@@ -47,6 +48,9 @@ class Carousel extends HTMLElement{
     
     get fullscreen(){ return this.getAttribute("fullscreen")}
     set fullscreen(v){ this.setAttribute("fullscreen", v)}
+
+    get timer(){ return this.getAttribute("timer")}
+    set timer(v){ v == ""? this.removeAttribute("timer"): this.setAttribute("timer", v)}
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -171,6 +175,8 @@ class Carousel extends HTMLElement{
             this._offset            = 100
             this._nImg              = this.root.wrapper.childElementCount
             this._imgList           = imgs
+            this._timerSeconds      = 0
+            this._timer             = null
             this._isLooped          = false
             this._isFullscreen      = false
             this._isTransitioning   = false
@@ -370,6 +376,11 @@ class Carousel extends HTMLElement{
 
                 break;
             }
+
+            case 'timer':{
+                this.setTimer(parseInt(newValue))
+                break  
+            }
         }
     }
 
@@ -446,6 +457,15 @@ class Carousel extends HTMLElement{
     disableBtnNext(){this.root.btnNext.disabled = true}
 
     enableBtnsNextPrev(){ this.enableBtnNext(); this.enableBtnPrev();}
+
+    setTimer(seconds){
+        seconds *= 1000
+        
+        clearTimeout(this._timer)
+
+        this._timer = setInterval(this.goNext.bind(this), seconds)
+    }
+
 
     //#endregion
 
@@ -826,6 +846,6 @@ function debounce(func, wait, immediate) {
 
 
     
-customElements.define('carousel-default', Carousel)
-customElements.define('carousel-dotted', CarouselDotted)
-customElements.define('carousel-preview', CarouselPreview)
+customElements.define('carousel-default',   Carousel)
+customElements.define('carousel-dotted',    CarouselDotted)
+customElements.define('carousel-preview',   CarouselPreview)
