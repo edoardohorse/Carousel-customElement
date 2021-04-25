@@ -101,12 +101,18 @@ class Carousel extends HTMLElement{
         this.root.header        = document.createElement('header')  // zIndex: 10
         this.root.aside         = document.createElement('aside')   // zIndex: 15
         this.root.footer        = document.createElement('footer')  // zIndex: 20
-        this.root.fullscreenEl  = document.createElement('i')       //zIndex:  30
+        this.root.controls      = document.createElement('div')       //zIndex:  30
+        this.root.fullscreenEl  = document.createElement('i')       
+        this.root.timerEl       = document.createElement('i')       
         this.root.style         = document.createElement('link')
         this.root.styleFullscreen= document.createElement('link')
 
-        //icon fullscreen
-        // this.root.fullscreenEl.innerHTML = '&#10530;'
+        // controls
+        this.root.controls.id       = 'controls'
+        this.root.fullscreenEl.id   = 'fullscreen'
+        this.root.timerEl.id        = 'timer'
+        this.root.controls.appendChild(this.root.timerEl)
+        this.root.controls.appendChild(this.root.fullscreenEl)
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
@@ -159,7 +165,8 @@ class Carousel extends HTMLElement{
         this.root.progression     = document.createElement('span')
         
 
-        this.root.appendChild(this.root.fullscreenEl)
+        
+        this.root.appendChild(this.root.controls)
         this.root.appendChild(this.root.header)
         this.root.appendChild(this.root.wrapper)
         this.root.appendChild(this.root.aside)
@@ -381,7 +388,10 @@ class Carousel extends HTMLElement{
             }
 
             case 'timer':{
-                this.setTimer(parseInt(newValue))
+                if(newValue == 'paused')
+                    this.setTimer(0)    
+                else
+                    this.setTimer(parseInt(newValue))
                 break  
             }
         }
@@ -395,6 +405,7 @@ class Carousel extends HTMLElement{
         this.root.btnPrev.addEventListener('click', this.goPrev.bind(this), false)
 
         this.root.fullscreenEl.addEventListener('click', this.toggleFullscreen.bind(this), false)
+        this.root.timerEl.addEventListener('click', this.togglePlayback.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -468,6 +479,7 @@ class Carousel extends HTMLElement{
         if(seconds <= 0 )
             return 
 
+        this._timerSeconds = seconds 
         seconds *= 1000
 
         this._timer = setInterval(_=>{
@@ -501,6 +513,20 @@ class Carousel extends HTMLElement{
 
     toggleFullscreen(){
         this._isFullscreen? this.closeFullscreen(): this.openFullscreen();
+    }
+
+    pause(){
+        this.timer = 'paused'
+        this._isPausedTimer = true
+    }
+
+    play(){
+        this.timer = this._timerSeconds
+        this._isPausedTimer = false
+    }
+
+    togglePlayback(){
+        this._isPausedTimer? this.play(): this.pause(); 
     }
     //#endregion
 }
