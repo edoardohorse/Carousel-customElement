@@ -177,6 +177,7 @@ class Carousel extends HTMLElement{
             this._imgList           = imgs
             this._timerSeconds      = 0
             this._timer             = null
+            this._isPausedTimer     = false
             this._isLooped          = false
             this._isFullscreen      = false
             this._isTransitioning   = false
@@ -191,6 +192,7 @@ class Carousel extends HTMLElement{
                     
                     this._isTransitioning = false
                     this._isDragging = true
+                    this._isPausedTimer = true
                     this._dragStartX = e.clientX
                     this._dragStartPercentage = -this._index * this._offset
                     this._commitDrag = false
@@ -235,7 +237,8 @@ class Carousel extends HTMLElement{
                 onMouseUp : e=>{
                     if(this._isDragging){
                         
-                        this._isDragging = false
+                        this._isDragging    = false
+                        this._isPausedTimer = false
                         this.root.wrapper.classList.remove('dragged')
             
                         // log('Mouse su')
@@ -459,11 +462,18 @@ class Carousel extends HTMLElement{
     enableBtnsNextPrev(){ this.enableBtnNext(); this.enableBtnPrev();}
 
     setTimer(seconds){
-        seconds *= 1000
         
         clearTimeout(this._timer)
+        
+        if(seconds <= 0 )
+            return 
 
-        this._timer = setInterval(this.goNext.bind(this), seconds)
+        seconds *= 1000
+
+        this._timer = setInterval(_=>{
+            if(!this._isPausedTimer)
+                this.goNext()
+        }, seconds)
     }
 
 
