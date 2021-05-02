@@ -12,7 +12,7 @@
 # Syntax
 
 Using [img-lazy](https://github.com/edoardohorse/Img-customElement), laziness is implemented into carousel.
-While using img, they are loaded on startup 
+While using img, they are loaded on startup. Check [important](#%EF%B8%8F-important) to understand previews behaviour.
 ```html
     <carousel-default
         size= big|[medium]|small 
@@ -148,5 +148,6 @@ Best way to get a responsive carousel
 - When **subtitle** is not setted the header is less height
 - When display's width is less then 600px, **previews** are not shown in carousel-preview
 - When **title** is setted and placed to the *bottom* in carousel-preview/dotted, it's not showed
+- Previews of `<carousel-preview>` are not show if there a some HTMLImageElement that are not fully loaded. If `<img-lazy>` are used, preview are showed instead.
 
 ---

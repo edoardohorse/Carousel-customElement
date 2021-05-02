@@ -616,6 +616,16 @@ class CarouselPreview extends Carousel{
         this.selectPreview( this._previewList[this._index] )
     }
 
+
+    set readyToShowPreview(v){
+        if(v)
+            this.root.footer.classList.add('extendable')
+        else
+            this.root.footer.classList.remove('extendable')
+
+        this._readyToShow = v
+    }
+
     constructor(){
         super()
 
@@ -626,6 +636,7 @@ class CarouselPreview extends Carousel{
             this._nPreviewPerSplit      = undefined
             this._offsetPreview         = 0
             this._indexSplitPreview     = 0
+            this._readyToShow           = false
 
         //#endregion
 
@@ -646,6 +657,7 @@ class CarouselPreview extends Carousel{
                 
                 // imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
                 
+                imgEl.onload = debounce(function(){this.calculateSplitPreview()}.bind(this),500)
                 
                 imgEl.classList.add('preview')
                 
@@ -663,8 +675,6 @@ class CarouselPreview extends Carousel{
             })
 
                   
-            
-            this.root.footer.classList.add('extendable')
 
             this.root.footer.appendChild(this.root.wrapperPreviews)
             this.root.footer.appendChild(this.root.btnPrevPreview)
@@ -723,6 +733,8 @@ class CarouselPreview extends Carousel{
     }
 
     calculateSplitPreview(timer = 0){
+        this.readyToShowPreview = false
+
         let calculate = _=>{
 
             console.group('Calculation splits', this.root)
@@ -821,9 +833,19 @@ class CarouselPreview extends Carousel{
             this.updateTranslate()
             console.table(Object.fromEntries(this._splitPreviews))
             console.groupEnd()
+
+            this.readyToShowPreview = true
         }
 
-        setTimeout(calculate.bind(this), timer)
+        // check if there are some HTMLImageElement that are not fully loaded 
+        let imgLoaded = new Set()
+        this._previewList.forEach(img=>{
+            if(img instanceof HTMLImageElement) imgLoaded.add(img.complete)
+        })
+
+        // if is set has at least one false, don't show previews
+        if(!imgLoaded.has(false))
+            setTimeout(calculate.bind(this), timer)
     }
 
     //#endregion
