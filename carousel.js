@@ -15,7 +15,7 @@ class Carousel extends HTMLElement{
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
     static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
     static get ATTR_FULLSCREEN     (){return new Set(['opened', 'closed',''])}
-    static get ATTR_SIZE           (){return new Set(['fill', 'contain', 'cover','none','scale-down'])}
+    static get ATTR_SIZE_IMG       (){return new Set(['fill', 'contain', 'cover','none','scale-down',''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -108,6 +108,7 @@ class Carousel extends HTMLElement{
         this.root.controls      = document.createElement('div')       //zIndex:  30
         this.root.fullscreenEl  = document.createElement('i')       
         this.root.timerEl       = document.createElement('i')       
+        this.root.sizeImgEl     = document.createElement('i')       
         this.root.style         = document.createElement('link')
         this.root.styleFullscreen= document.createElement('link')
 
@@ -115,6 +116,8 @@ class Carousel extends HTMLElement{
         this.root.controls.id       = 'controls'
         this.root.fullscreenEl.id   = 'fullscreen'
         this.root.timerEl.id        = 'timer'
+        this.root.sizeImgEl.id      = 'sizeImg'
+        this.root.controls.appendChild(this.root.sizeImgEl)
         this.root.controls.appendChild(this.root.timerEl)
         this.root.controls.appendChild(this.root.fullscreenEl)
 
@@ -195,6 +198,7 @@ class Carousel extends HTMLElement{
             this._isPausedTimer     = false
             this._isLooped          = false
             this._isFullscreen      = false
+            this._isSizeImgSettedCover = true
             this._isTransitioning   = false
             this._isDraggable       = false
             this._isDragging        = false
@@ -289,6 +293,7 @@ class Carousel extends HTMLElement{
             this.disableBtnPrev()
 
         this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+        this.sizeImg = 'cover'
 
         this.addEventListener()
     }
@@ -402,13 +407,20 @@ class Carousel extends HTMLElement{
                     this.setTimer(parseInt(newValue))
                 break  
             }
+
             case 'size-img':{
-                if(!ImgLazy.ATTR_SIZE.has(newValue)) return console.error('Can be setted only value: ', ImgLazy.ATTR_SIZE)
+                if(!Carousel.ATTR_SIZE_IMG.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_SIZE_IMG)
+                
+                if(newValue == 'cover' || newValue == ''){this._isSizeImgSettedCover = true, newValue = 'cover'}
+                else                                      this._isSizeImgSettedCover = false
 
                 this._imgList.forEach(img=>{
                     if(img instanceof HTMLImageElement) img.style.objectFit = newValue
                     else img.size = newValue
                 })
+
+                
+
 
                 break
             }
@@ -424,6 +436,7 @@ class Carousel extends HTMLElement{
 
         this.root.fullscreenEl.addEventListener('click', this.toggleFullscreen.bind(this), false)
         this.root.timerEl.addEventListener('click', this.togglePlayback.bind(this), false)
+        this.root.sizeImgEl.addEventListener('click', this.toggleSizeImgCover.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -531,6 +544,11 @@ class Carousel extends HTMLElement{
 
     toggleFullscreen(){
         this._isFullscreen? this.closeFullscreen(): this.openFullscreen();
+    }
+
+    toggleSizeImgCover(){
+        if(this._isSizeImgSettedCover) this.sizeImg = 'contain'
+        else                         this.sizeImg = 'cover'
     }
 
     pause(){

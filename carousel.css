@@ -111,6 +111,7 @@
     user-select: none;
     font-style: normal;
     box-sizing: border-box;
+    background-size: contain;
 }
 
 
@@ -134,11 +135,21 @@
 :host([timer]) > #controls > i#timer{
     display: flex;
     background-image: url('./icons/pause.svg');
-    background-size: contain;
 }
 
 :host([timer='paused']) > #controls > i#timer{
     background-image: url('./icons/play.svg');
+}
+
+:host([size-img]) > #controls > i#sizeImg,
+:host([size-img='cover']) > #controls > i#sizeImg{
+    display: flex;
+    background-image: url('./icons/contain.svg');
+}
+
+:host([size-img='contain']) > #controls > i#sizeImg{
+    display: flex;
+    background-image: url('./icons/cover.svg');
 }
 
 header {

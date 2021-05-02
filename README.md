@@ -34,7 +34,7 @@ While using img, they are loaded on startup. Check [important](#%EF%B8%8F-import
         
         timer = seconds
         
-        size-img=fill|[contain]|cover|none|scale-down>
+        size-img=fill|contain|[cover]|none|scale-down>
 
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
