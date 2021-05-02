@@ -3,7 +3,7 @@
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size',
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'size-img',
                 'width', 'height', 'drag', 'loop', 'progression', 'fullscreen', 'timer']
     }
 
@@ -15,6 +15,7 @@ class Carousel extends HTMLElement{
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
     static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
     static get ATTR_FULLSCREEN     (){return new Set(['opened', 'closed',''])}
+    static get ATTR_SIZE           (){return new Set(['fill', 'contain', 'cover','none','scale-down'])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -51,6 +52,9 @@ class Carousel extends HTMLElement{
 
     get timer(){ return this.getAttribute("timer")}
     set timer(v){ v == ""? this.removeAttribute("timer"): this.setAttribute("timer", v)}
+    
+    get sizeImg(){ return this.getAttribute("size-img")}
+    set sizeImg(v){ this.setAttribute("size-img", v)}
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -398,6 +402,16 @@ class Carousel extends HTMLElement{
                     this.setTimer(parseInt(newValue))
                 break  
             }
+            case 'size-img':{
+                if(!ImgLazy.ATTR_SIZE.has(newValue)) return console.error('Can be setted only value: ', ImgLazy.ATTR_SIZE)
+
+                this._imgList.forEach(img=>{
+                    if(img instanceof HTMLImageElement) img.style.objectFit = newValue
+                    else img.size = newValue
+                })
+
+                break
+            }
         }
     }
 
@@ -654,6 +668,7 @@ class CarouselPreview extends Carousel{
                 let imgEl = img.cloneNode()
                 // imgEl.lazy = false
                                 
+                if(img instanceof ImgLazy) imgEl.size = 'cover'
                 
                 // imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
                 

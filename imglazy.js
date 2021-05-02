@@ -19,13 +19,14 @@ const observer = new IntersectionObserver( function(entries, observer){
 class ImgLazy extends HTMLElement{
 
     static get observedAttributes(){
-        return ['src','lazy','placeholder','width', 'height','alt']
+        return ['src','lazy','placeholder','width', 'height','alt', 'size']
     }
 
     static get TEXT_FAILED_LOADING(){return "Image not found 😢"}
 
     static get ATTR_LAZY(){return new Set(['true', 'false', ''])}
     static get ATTR_PLACEHOLDER(){return new Set(['true', 'false', ''])}
+    static get ATTR_SIZE(){return new Set(['fill', 'contain', 'cover','none','scale-down'])}
 
     get lazy(){ return this.getAttribute("lazy")}
     set lazy(v){this.setAttribute("lazy", v)}
@@ -44,6 +45,10 @@ class ImgLazy extends HTMLElement{
     
     get alt(){ return this.getAttribute("alt")}
     set alt(v){ this.setAttribute("alt", v)}
+    
+    get size(){ return this.getAttribute("size")}
+    set size(v){ this.setAttribute("size", v)}
+    
 
      constructor(){
         super()
@@ -160,6 +165,14 @@ class ImgLazy extends HTMLElement{
                 this.root.altText.textContent = ImgLazy.TEXT_FAILED_LOADING
                 break
             }
+
+            case 'size':{
+                if(!ImgLazy.ATTR_SIZE.has(newValue)) return console.error('Can be setted only value: ', ImgLazy.ATTR_SIZE)
+
+                this.root.image.style.objectFit = newValue
+
+                break
+            }
            
         }
     }
@@ -168,7 +181,7 @@ class ImgLazy extends HTMLElement{
     
 
         load(){
-            if(this._isLoaded || this._isLoading || !this._isLazy)
+            if(this._isLoaded || this._isLoading)
                 return 
             
             this._isLoading = true

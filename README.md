@@ -32,7 +32,9 @@ While using img, they are loaded on startup. Check [important](#%EF%B8%8F-import
         
         fullscreen = true|[false]
         
-        timer = seconds>
+        timer = seconds
+        
+        size-img=fill|[contain]|cover|none|scale-down>
 
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
@@ -123,6 +125,10 @@ Set a timer of how many seconds the carousel will go next img automatically
 |carousel-font-size-progression|12px|
 |carousel-size-width-custom|setted via [width](#width-height) attribute|
 |carousel-size-height-custom|setted via [height](#width-height) attribute|
+
+## Size-img
+
+ Reflect CSS property objectFit, to set size of images. See [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit)
 
 
 ## Responsivness
