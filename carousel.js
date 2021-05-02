@@ -148,10 +148,22 @@ class Carousel extends HTMLElement{
         
 
         //images
-        let imgs = this.querySelectorAll('img-lazy')
-        imgs.forEach(img=>{            
-            this.root.wrapper.appendChild(img)
+        let imgs = this.querySelectorAll('img-lazy, img')
+        
+        imgs.forEach(img=>{
+            
+            if(img instanceof ImgLazy)
+                return this.root.wrapper.appendChild(img)
+
+            let el = document.createElement('div')
+            el.setAttribute('data-src', img.src.replace(location.href, "./"))                
+            
+            el.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+            this.root.wrapper.appendChild(el)
+            
+            this.removeChild(img)
         })
+
 
         //progression
         this.root.progression     = document.createElement('span')
@@ -628,14 +640,15 @@ class CarouselPreview extends Carousel{
             let indexPreview = 1 
             this._imgList.forEach(img=>{
 
-                /*let imgEl = document.createElement('div')        
-                imgEl.classList.add('preview')
-                
-                imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`*/
-                
                 let imgEl = img.cloneNode()
-                imgEl.classList.add('preview')
                 // imgEl.lazy = false
+                                
+                
+                // imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+                
+                
+                imgEl.classList.add('preview')
+                
 
                 imgEl.addEventListener('click', function(el, index){
                     // debugger

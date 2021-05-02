@@ -11,6 +11,8 @@
 
 # Syntax
 
+Using [img-lazy](https://github.com/edoardohorse/Img-customElement), laziness is implemented into carousel.
+While using img, they are loaded on startup 
 ```html
     <carousel-default
         size= big|[medium]|small 
@@ -35,6 +37,10 @@
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
             <img src='img/foo3.jpg'>
+            or
+            <img-lazy src='img/foo.jpg'></img-lazy> 
+            <img-lazy src='img/foo2.jpg'></img-lazy>
+            <img-lazy src='img/foo3.jpg'></img-lazy>
     </carousel-default>
 ```
 

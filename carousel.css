@@ -313,10 +313,10 @@ footer > main .preview {
     height: calc(100% - 20px);
     padding: 0;
     margin: 5px;
-    background-size: cover;
     cursor: pointer;
     transform: scale(1);
     transition: transform 150ms;
+    object-fit: cover;
 }
 
 footer.extendable > main .preview.selected {
