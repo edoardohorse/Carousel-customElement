@@ -148,17 +148,9 @@ class Carousel extends HTMLElement{
         
 
         //images
-        let imgs = this.querySelectorAll('img')
-        imgs.forEach(img=>{
-
-            
-            let div = document.createElement('div')
-            div.setAttribute('data-src', img.src.replace(location.href, "./"))                
-            this.root.wrapper.appendChild(div)
-
-            div.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
-            
-            this.removeChild(img)
+        let imgs = this.querySelectorAll('img-lazy')
+        imgs.forEach(img=>{            
+            this.root.wrapper.appendChild(img)
         })
 
         //progression
@@ -636,10 +628,14 @@ class CarouselPreview extends Carousel{
             let indexPreview = 1 
             this._imgList.forEach(img=>{
 
-                let imgEl = document.createElement('div')        
+                /*let imgEl = document.createElement('div')        
                 imgEl.classList.add('preview')
-
-                imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+                
+                imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`*/
+                
+                let imgEl = img.cloneNode()
+                imgEl.classList.add('preview')
+                // imgEl.lazy = false
 
                 imgEl.addEventListener('click', function(el, index){
                     // debugger
@@ -652,6 +648,7 @@ class CarouselPreview extends Carousel{
                 this._previewList.push(imgEl)
                 indexPreview++
             })
+
                   
             
             this.root.footer.classList.add('extendable')

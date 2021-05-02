@@ -193,6 +193,7 @@ main {
     transition: transform var(--carousel-transition-slide-duration);
     transition-timing-function: var(--carousel-cubic-bezier-material);
     z-index: 5;
+    max-height: 100%;
     /* background-color: rgb(33 33 33); */
 }
 
