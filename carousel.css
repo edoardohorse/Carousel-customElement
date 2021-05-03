@@ -111,6 +111,7 @@
     user-select: none;
     font-style: normal;
     box-sizing: border-box;
+    background-size: contain;
 }
 
 
@@ -134,11 +135,21 @@
 :host([timer]) > #controls > i#timer{
     display: flex;
     background-image: url('./icons/pause.svg');
-    background-size: contain;
 }
 
 :host([timer='paused']) > #controls > i#timer{
     background-image: url('./icons/play.svg');
+}
+
+:host([size-img]) > #controls > i#sizeImg,
+:host([size-img='cover']) > #controls > i#sizeImg{
+    display: flex;
+    background-image: url('./icons/contain.svg');
+}
+
+:host([size-img='contain']) > #controls > i#sizeImg{
+    display: flex;
+    background-image: url('./icons/cover.svg');
 }
 
 header {
@@ -193,6 +204,7 @@ main {
     transition: transform var(--carousel-transition-slide-duration);
     transition-timing-function: var(--carousel-cubic-bezier-material);
     z-index: 5;
+    max-height: 100%;
     /* background-color: rgb(33 33 33); */
 }
 
@@ -270,7 +282,13 @@ footer {
     justify-content: center;
 }
 
+/*preview not showable*/
+:host(carousel-preview) footer:not(.extendable){
+    display: none;
+}
+
 footer.extendable{
+    display: flex;
     height: 20%;
     transform: translateY(100%);
     transition: transform 300ms var(--carousel-cubic-bezier-material);
@@ -312,10 +330,10 @@ footer > main .preview {
     height: calc(100% - 20px);
     padding: 0;
     margin: 5px;
-    background-size: cover;
     cursor: pointer;
     transform: scale(1);
     transition: transform 150ms;
+    object-fit: cover;
 }
 
 footer.extendable > main .preview.selected {

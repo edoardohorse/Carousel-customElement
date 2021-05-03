@@ -22,35 +22,40 @@
 
         
 
-        <carousel-dotted width=300 height=200 drag loop fullscreen>
-            <img src="./img/1.jpg">
-            <img src="./img/2.jpg">
-            <img src="./img/3.jpg">
+        <!-- <carousel-dotted width=300 height=200 drag loop fullscreen>
+            <img-lazy src="./img/1.jpg"></img-lazy>
+            <img-lazy src="./img/2.jpg"></img-lazy>
+            <img-lazy src="./img/3.jpg"></img-lazy>
         </carousel-dotted>
-        
-        <carousel-preview loop width=640 height=480 progression fullscreen drag timer=2>
-            <img src="./img/1.jpg">
-            <img src="./img/2.jpg">
-            <img src="./img/3.jpg">
-            <img src="./img/4.jpg">
-            <img src="./img/5.jpg">
-            <img src="./img/6.jpg">
-            <img src="./img/7.jpg">
+         -->
+        <carousel-preview loop width=640 height=480 progression fullscreen drag timer=3 size-img>
+            <!-- <img-lazy src="img/building.jpg"></img-lazy> -->
+            <img-lazy src="img/building.jpg"></img-lazy>
+            <img-lazy src="img/lion/large.jpg"></img-lazy>
+            <img-lazy src="img/lion/small.jpg"></img-lazy>
+            <img-lazy lazy=false src="img/trees.jpg"></img-lazy>
         </carousel-preview>
         
-        <!-- <carousel-default width=300 height=200 drag loop navigation="dotted">
-            <img src="./img/1.jpg">
-            <img src="./img/2.jpg">
-            <img src="./img/3.jpg">
-        </carousel-default> -->
-
-        
-        
-        <carousel-default title='Intestazione' width=400 loop=false>
-            <img src="./img/1.jpg">
-            <img src="./img/2.jpg">
-            <img src="./img/3.jpg">
+        <carousel-default size=big drag loop navigation="dotted">
+            <img-lazy src="img/sky.jpg"></img-lazy>
+            <img-lazy src="img/water.jpg"></img-lazy>
         </carousel-default>
+        
+        
+        <carousel-preview loop width=640 height=480 progression fullscreen drag timer=3 size-img>
+            <!-- <img-lazy src="img/building.jpg"></img-lazy> -->
+            <img-lazy src="img/building.jpg"></img-lazy>
+            <img-lazy src="img/lion/large.jpg"></img-lazy>
+            <img-lazy src="img/lion/small.jpg"></img-lazy>
+            <img-lazy lazy=false src="img/trees.jpg"></img-lazy>
+        </carousel-preview>
+        
+        
+        <!-- <carousel-default title='Intestazione' width=400 loop=false>
+            <img-lazy src="./img/1.jpg"></img-lazy>
+            <img-lazy src="./img/2.jpg"></img-lazy>
+            <img-lazy src="./img/3.jpg"></img-lazy>
+        </carousel-default> -->
 
         <div id='log'>
 
@@ -63,6 +68,8 @@
             div.innerHTML = `<p>${s}</p>` + div.innerHTML
         }
     </script>
+    <script src="placeholder.js" defer></script>
+    <script src="imglazy.js" defer></script>
     <script src="carousel.js" defer></script>
     
 </html>

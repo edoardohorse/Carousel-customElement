@@ -11,6 +11,8 @@
 
 # Syntax
 
+Using [img-lazy](https://github.com/edoardohorse/Img-customElement), laziness is implemented into carousel.
+While using img, they are loaded on startup. Check [important](#%EF%B8%8F-important) to understand previews behaviour.
 ```html
     <carousel-default
         size= big|[medium]|small 
@@ -30,11 +32,17 @@
         
         fullscreen = true|[false]
         
-        timer = seconds>
+        timer = seconds
+        
+        size-img=fill|contain|[cover]|none|scale-down>
 
             <img src='img/foo.jpg'>
             <img src='img/foo2.jpg'>
             <img src='img/foo3.jpg'>
+            or
+            <img-lazy src='img/foo.jpg'></img-lazy> 
+            <img-lazy src='img/foo2.jpg'></img-lazy>
+            <img-lazy src='img/foo3.jpg'></img-lazy>
     </carousel-default>
 ```
 
@@ -118,6 +126,10 @@ Set a timer of how many seconds the carousel will go next img automatically
 |carousel-size-width-custom|setted via [width](#width-height) attribute|
 |carousel-size-height-custom|setted via [height](#width-height) attribute|
 
+## Size-img
+
+ Reflect CSS property objectFit, to set size of images. See [object-fit](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit)
+
 
 ## Responsivness
 
@@ -142,5 +154,6 @@ Best way to get a responsive carousel
 - When **subtitle** is not setted the header is less height
 - When display's width is less then 600px, **previews** are not shown in carousel-preview
 - When **title** is setted and placed to the *bottom* in carousel-preview/dotted, it's not showed
+- Previews of `<carousel-preview>` are not show if there a some HTMLImageElement that are not fully loaded. If `<img-lazy>` are used, preview are showed instead.
 
 ---

@@ -1,9 +1,23 @@
 'use strict';
 
+const OPTIONS_OBSERVER_CAROUSEL =  {
+    root: null,
+    rootMargin: '0px',
+    threshold: .4
+}
+
+const observerCarousel = new IntersectionObserver( function(entries, observerCarousel){
+        entries.forEach(entry => {
+            if(entry.isIntersecting) entry.target.shown = true
+            else                     entry.target.shown = false
+        })
+    }
+    , OPTIONS_OBSERVER_CAROUSEL);
+
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
-        return ['title', 'subtitle', 'header-position', 'header-above', 'size',
+        return ['title', 'subtitle', 'header-position', 'header-above', 'size', 'size-img',
                 'width', 'height', 'drag', 'loop', 'progression', 'fullscreen', 'timer']
     }
 
@@ -15,6 +29,7 @@ class Carousel extends HTMLElement{
     static get ATTR_LOOP           (){return new Set(['true', 'false', ''])}
     static get ATTR_PROGRESSION    (){return new Set(['true', 'false', ''])}
     static get ATTR_FULLSCREEN     (){return new Set(['opened', 'closed',''])}
+    static get ATTR_SIZE_IMG       (){return new Set(['fill', 'contain', 'cover','none','scale-down',''])}
 
     get title(){ return this.getAttribute("title")}
     set title(v){ v == ""? this.removeAttribute("title"): this.setAttribute("title", v)}
@@ -51,6 +66,17 @@ class Carousel extends HTMLElement{
 
     get timer(){ return this.getAttribute("timer")}
     set timer(v){ v == ""? this.removeAttribute("timer"): this.setAttribute("timer", v)}
+    
+    get sizeImg(){ return this.getAttribute("size-img")}
+    set sizeImg(v){ this.setAttribute("size-img", v)}
+
+    get shown(){return this._isShown}
+    set shown(v){
+        if(v) this.play()
+        else  this.pause()
+
+        this._isShown = v
+    }
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -104,6 +130,7 @@ class Carousel extends HTMLElement{
         this.root.controls      = document.createElement('div')       //zIndex:  30
         this.root.fullscreenEl  = document.createElement('i')       
         this.root.timerEl       = document.createElement('i')       
+        this.root.sizeImgEl     = document.createElement('i')       
         this.root.style         = document.createElement('link')
         this.root.styleFullscreen= document.createElement('link')
 
@@ -111,13 +138,18 @@ class Carousel extends HTMLElement{
         this.root.controls.id       = 'controls'
         this.root.fullscreenEl.id   = 'fullscreen'
         this.root.timerEl.id        = 'timer'
+        this.root.sizeImgEl.id      = 'sizeImg'
+        this.root.controls.appendChild(this.root.sizeImgEl)
         this.root.controls.appendChild(this.root.timerEl)
         this.root.controls.appendChild(this.root.fullscreenEl)
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
         this.root.style.setAttribute('href','carousel.css')
-        
+        this.root.style.addEventListener('load', _=>{
+            if(this._timer) observerCarousel.observe(this)
+        })
+
         this.root.styleFullscreen.setAttribute('rel','stylesheet')
         this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
         this.root.styleFullscreen.disabled = true
@@ -148,18 +180,21 @@ class Carousel extends HTMLElement{
         
 
         //images
-        let imgs = this.querySelectorAll('img')
+        let imgs = this.querySelectorAll('img-lazy, img')
+        
         imgs.forEach(img=>{
-
             
-            let div = document.createElement('div')
-            div.setAttribute('data-src', img.src.replace(location.href, "./"))                
-            this.root.wrapper.appendChild(div)
+            if(img instanceof ImgLazy) return this.root.wrapper.appendChild(img)
 
-            div.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+            let el = document.createElement('div')
+            el.setAttribute('data-src', img.src.replace(location.href, "./"))                
+            
+            el.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+            this.root.wrapper.appendChild(el)
             
             this.removeChild(img)
         })
+
 
         //progression
         this.root.progression     = document.createElement('span')
@@ -177,16 +212,18 @@ class Carousel extends HTMLElement{
 
         //#region Fields         
         
-            // L'indice parte da 0. Ma per l'utente parte da 1
+            // Index starts from 0. Though, for the user starts from 1
             this._index             = 0
             this._offset            = 100
             this._nImg              = this.root.wrapper.childElementCount
             this._imgList           = imgs
             this._timerSeconds      = 0
             this._timer             = null
+            this._isShown           = false
             this._isPausedTimer     = false
             this._isLooped          = false
             this._isFullscreen      = false
+            this._isSizeImgSettedCover = true
             this._isTransitioning   = false
             this._isDraggable       = false
             this._isDragging        = false
@@ -265,6 +302,21 @@ class Carousel extends HTMLElement{
                     }
                 }
             }
+
+            this._nextIndex = _=>{
+                let next = this._index+1
+                if( next > this.nImg-1)
+                    return (this._isLooped? 0: this._index)
+                return next
+            }
+            
+            this._prevIndex = _=>{
+                let prev = this._index-1
+                if( prev < 0)
+                    return (this._isLooped? this._nImg-1: 0)
+                return prev
+            }
+            
             
         //#endregion
         
@@ -281,6 +333,7 @@ class Carousel extends HTMLElement{
             this.disableBtnPrev()
 
         this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+        this.sizeImg = 'cover'
 
         this.addEventListener()
     }
@@ -394,6 +447,23 @@ class Carousel extends HTMLElement{
                     this.setTimer(parseInt(newValue))
                 break  
             }
+
+            case 'size-img':{
+                if(!Carousel.ATTR_SIZE_IMG.has(newValue)) return console.error('Can be setted only value: ', Carousel.ATTR_SIZE_IMG)
+                
+                if(newValue == 'cover' || newValue == ''){this._isSizeImgSettedCover = true, newValue = 'cover'}
+                else                                      this._isSizeImgSettedCover = false
+
+                this._imgList.forEach(img=>{
+                    if(img instanceof HTMLImageElement) img.style.objectFit = newValue
+                    else img.size = newValue
+                })
+
+                
+
+
+                break
+            }
         }
     }
 
@@ -404,8 +474,9 @@ class Carousel extends HTMLElement{
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
         this.root.btnPrev.addEventListener('click', this.goPrev.bind(this), false)
 
-        this.root.fullscreenEl.addEventListener('click', this.toggleFullscreen.bind(this), false)
-        this.root.timerEl.addEventListener('click', this.togglePlayback.bind(this), false)
+        this.root.fullscreenEl.addEventListener('click',this.toggleFullscreen.bind(this), false)
+        this.root.timerEl.addEventListener('click',     this.togglePlayback.bind(this), false)
+        this.root.sizeImgEl.addEventListener('click',   this.toggleSizeImgCover.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -483,7 +554,7 @@ class Carousel extends HTMLElement{
         seconds *= 1000
 
         this._timer = setInterval(_=>{
-            if(!this._isPausedTimer)
+            if(!this._isPausedTimer && this._imgList[this._index].complete)
                 this.goNext()
         }, seconds)
     }
@@ -513,6 +584,11 @@ class Carousel extends HTMLElement{
 
     toggleFullscreen(){
         this._isFullscreen? this.closeFullscreen(): this.openFullscreen();
+    }
+
+    toggleSizeImgCover(){
+        if(this._isSizeImgSettedCover) this.sizeImg = 'contain'
+        else                         this.sizeImg = 'cover'
     }
 
     pause(){
@@ -612,6 +688,16 @@ class CarouselPreview extends Carousel{
         this.selectPreview( this._previewList[this._index] )
     }
 
+
+    set readyToShowPreview(v){
+        if(v)
+            this.root.footer.classList.add('extendable')
+        else
+            this.root.footer.classList.remove('extendable')
+
+        this._readyToShow = v
+    }
+
     constructor(){
         super()
 
@@ -622,6 +708,7 @@ class CarouselPreview extends Carousel{
             this._nPreviewPerSplit      = undefined
             this._offsetPreview         = 0
             this._indexSplitPreview     = 0
+            this._readyToShow           = false
 
         //#endregion
 
@@ -636,10 +723,17 @@ class CarouselPreview extends Carousel{
             let indexPreview = 1 
             this._imgList.forEach(img=>{
 
-                let imgEl = document.createElement('div')        
+                let imgEl = img.cloneNode()
+                // imgEl.lazy = false
+                                
+                if(img instanceof ImgLazy) imgEl.size = 'cover'
+                
+                // imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+                
+                imgEl.onload = debounce(function(){this.calculateSplitPreview()}.bind(this),500)
+                
                 imgEl.classList.add('preview')
-
-                imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+                
 
                 imgEl.addEventListener('click', function(el, index){
                     // debugger
@@ -652,9 +746,8 @@ class CarouselPreview extends Carousel{
                 this._previewList.push(imgEl)
                 indexPreview++
             })
+
                   
-            
-            this.root.footer.classList.add('extendable')
 
             this.root.footer.appendChild(this.root.wrapperPreviews)
             this.root.footer.appendChild(this.root.btnPrevPreview)
@@ -713,7 +806,11 @@ class CarouselPreview extends Carousel{
     }
 
     calculateSplitPreview(timer = 0){
+        this.readyToShowPreview = false
+
         let calculate = _=>{
+            // see footer extendible first, than make calculation
+            this.readyToShowPreview = true
 
             console.group('Calculation splits', this.root)
             console.debug('Calculeted split preview')
@@ -813,7 +910,15 @@ class CarouselPreview extends Carousel{
             console.groupEnd()
         }
 
-        setTimeout(calculate.bind(this), timer)
+        // check if there are some HTMLImageElement that are not fully loaded 
+        let imgLoaded = new Set()
+        this._previewList.forEach(img=>{
+            if(img instanceof HTMLImageElement) imgLoaded.add(img.complete)
+        })
+
+        // if is set has at least one false, don't show previews
+        if(!imgLoaded.has(false))
+            setTimeout(calculate.bind(this), timer)
     }
 
     //#endregion
