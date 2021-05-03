@@ -1,5 +1,19 @@
 'use strict';
 
+const OPTIONS_OBSERVER_CAROUSEL =  {
+    root: null,
+    rootMargin: '0px',
+    threshold: .4
+}
+
+const observerCarousel = new IntersectionObserver( function(entries, observerCarousel){
+        entries.forEach(entry => {
+            if(entry.isIntersecting) entry.target.shown = true
+            else                     entry.target.shown = false
+        })
+    }
+    , OPTIONS_OBSERVER_CAROUSEL);
+
 class Carousel extends HTMLElement{
 
     static get observedAttributes(){
@@ -55,6 +69,14 @@ class Carousel extends HTMLElement{
     
     get sizeImg(){ return this.getAttribute("size-img")}
     set sizeImg(v){ this.setAttribute("size-img", v)}
+
+    get shown(){return this._isShown}
+    set shown(v){
+        if(v) this.play()
+        else  this.pause()
+
+        this._isShown = v
+    }
      
     get index(){return this._index+1}
     get nImg(){return this._nImg}
@@ -124,7 +146,10 @@ class Carousel extends HTMLElement{
         //style
         this.root.style.setAttribute('rel','stylesheet')
         this.root.style.setAttribute('href','carousel.css')
-        
+        this.root.style.addEventListener('load', _=>{
+            if(this._timer) observerCarousel.observe(this)
+        })
+
         this.root.styleFullscreen.setAttribute('rel','stylesheet')
         this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
         this.root.styleFullscreen.disabled = true
@@ -194,6 +219,7 @@ class Carousel extends HTMLElement{
             this._imgList           = imgs
             this._timerSeconds      = 0
             this._timer             = null
+            this._isShown           = false
             this._isPausedTimer     = false
             this._isLooped          = false
             this._isFullscreen      = false
