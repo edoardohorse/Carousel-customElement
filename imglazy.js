@@ -10,7 +10,6 @@ const observer = new IntersectionObserver( function(entries, observer){
         entries.forEach(entry => {
             if(entry.isIntersecting){
                 entry.target.load()
-                // debugger
             }
         })
     }
@@ -48,6 +47,17 @@ class ImgLazy extends HTMLElement{
     
     get size(){ return this.getAttribute("size")}
     set size(v){ this.setAttribute("size", v)}
+
+    set readyToLoad(v){
+        this._readToLoad = v
+        
+        if(this._isLazy)
+            observer.observe(this)
+        else
+            observer.unobserve(this)
+    }
+
+    get complete(){return this.root.image.complete}
     
 
      constructor(){
@@ -63,6 +73,12 @@ class ImgLazy extends HTMLElement{
         //style
         this.root.style.setAttribute('rel','stylesheet')
         this.root.style.setAttribute('href','img.css')
+        this.root.style.addEventListener('load', _=>{
+            // when css is loaded and img-lazy is printed into the page with all calculations made
+            // set that is ready to load. This means that from now it can be observed and load the
+            // image IF is showed into the screen AND IF it's lazy.
+            this.readyToLoad = true
+        })
 
         this.root.appendChild(this.root.style)
 
@@ -86,6 +102,7 @@ class ImgLazy extends HTMLElement{
             this._isLoading = false
             this._isLazy = true
             this._isPlaceholderShowable = true
+            this._readToLoad = false
                     
         //#endregion
         
@@ -93,14 +110,19 @@ class ImgLazy extends HTMLElement{
     }
 
     connectedCallback(){
+        if(!this._isLazy){
+            this._readToLoad = true
+            this.load()
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         switch(name){
             case 'src':{
                 this._src = newValue
-                if(this._isLazy)
-                    setTimeout( _=>{observer.observe(this)}, 50)
+                this._isLoaded = false
+                if(!this._isLazy)
+                    this.load()
                 break
             }
 
@@ -109,11 +131,9 @@ class ImgLazy extends HTMLElement{
 
                 if(newValue == "true" || newValue == ""){
                     this._isLazy = true
-                    observer.observe(this)
                 }
                 else if(newValue == "false"){
                     this._isLazy = false
-                    observer.unobserve(this)
                 }
 
 
@@ -181,7 +201,7 @@ class ImgLazy extends HTMLElement{
     
 
         load(){
-            if(this._isLoaded || this._isLoading)
+            if(this._isLoaded || this._isLoading || !this._readToLoad)
                 return 
             
             this._isLoading = true

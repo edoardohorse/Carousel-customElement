@@ -159,8 +159,7 @@ class Carousel extends HTMLElement{
         
         imgs.forEach(img=>{
             
-            if(img instanceof ImgLazy)
-                return this.root.wrapper.appendChild(img)
+            if(img instanceof ImgLazy) return this.root.wrapper.appendChild(img)
 
             let el = document.createElement('div')
             el.setAttribute('data-src', img.src.replace(location.href, "./"))                
@@ -769,6 +768,8 @@ class CarouselPreview extends Carousel{
         this.readyToShowPreview = false
 
         let calculate = _=>{
+            // see footer extendible first, than make calculation
+            this.readyToShowPreview = true
 
             console.group('Calculation splits', this.root)
             console.debug('Calculeted split preview')
@@ -866,8 +867,6 @@ class CarouselPreview extends Carousel{
             this.updateTranslate()
             console.table(Object.fromEntries(this._splitPreviews))
             console.groupEnd()
-
-            this.readyToShowPreview = true
         }
 
         // check if there are some HTMLImageElement that are not fully loaded 
