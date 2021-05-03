@@ -187,7 +187,7 @@ class Carousel extends HTMLElement{
 
         //#region Fields         
         
-            // L'indice parte da 0. Ma per l'utente parte da 1
+            // Index starts from 0. Though, for the user starts from 1
             this._index             = 0
             this._offset            = 100
             this._nImg              = this.root.wrapper.childElementCount
@@ -276,6 +276,21 @@ class Carousel extends HTMLElement{
                     }
                 }
             }
+
+            this._nextIndex = _=>{
+                let next = this._index+1
+                if( next > this.nImg-1)
+                    return (this._isLooped? 0: this._index)
+                return next
+            }
+            
+            this._prevIndex = _=>{
+                let prev = this._index-1
+                if( prev < 0)
+                    return (this._isLooped? this._nImg-1: 0)
+                return prev
+            }
+            
             
         //#endregion
         
@@ -433,9 +448,9 @@ class Carousel extends HTMLElement{
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
         this.root.btnPrev.addEventListener('click', this.goPrev.bind(this), false)
 
-        this.root.fullscreenEl.addEventListener('click', this.toggleFullscreen.bind(this), false)
-        this.root.timerEl.addEventListener('click', this.togglePlayback.bind(this), false)
-        this.root.sizeImgEl.addEventListener('click', this.toggleSizeImgCover.bind(this), false)
+        this.root.fullscreenEl.addEventListener('click',this.toggleFullscreen.bind(this), false)
+        this.root.timerEl.addEventListener('click',     this.togglePlayback.bind(this), false)
+        this.root.sizeImgEl.addEventListener('click',   this.toggleSizeImgCover.bind(this), false)
         
         // document.addEventListener('keydown', e=>{
         //     switch(e.keyCode){
@@ -513,7 +528,7 @@ class Carousel extends HTMLElement{
         seconds *= 1000
 
         this._timer = setInterval(_=>{
-            if(!this._isPausedTimer)
+            if(!this._isPausedTimer && this._imgList[this._index].complete)
                 this.goNext()
         }, seconds)
     }
