@@ -51,7 +51,7 @@ class ImgLazy extends HTMLElement{
     set size(v){ this.setAttribute("size", v)}
 
     set readyToLoad(v){
-        this._readToLoad = v
+        this._readyToLoad = v
         
         if(this._isLazy)
             observer.observe(this)
@@ -62,7 +62,7 @@ class ImgLazy extends HTMLElement{
     get complete(){return this.root.image.complete}
     
 
-     constructor(){
+    constructor(src = null){
         super()
 
         //#region Root
@@ -98,13 +98,14 @@ class ImgLazy extends HTMLElement{
         
         //#endregion
 
-        //#region Fields        
-            this._src = this.src
+        //#region Fields
+            if(src) this.src = src
+            else    this._src = this.src
             this._isLoaded = false
             this._isLoading = false
             this._isLazy = true
             this._isPlaceholderShowable = true
-            this._readToLoad = false
+            this._readyToLoad = false
                     
         //#endregion
         
@@ -113,7 +114,7 @@ class ImgLazy extends HTMLElement{
 
     connectedCallback(){
         if(!this._isLazy){
-            this._readToLoad = true
+            this._readyToLoad = true
             this.load()
         }
     }
@@ -136,6 +137,7 @@ class ImgLazy extends HTMLElement{
                 }
                 else if(newValue == "false"){
                     this._isLazy = false
+                    this._readyToLoad = true
                 }
 
 
@@ -201,21 +203,6 @@ class ImgLazy extends HTMLElement{
 
     //#region Private
     
-
-        load(){
-            if(this._isLoaded || this._isLoading || !this._readToLoad)
-                return 
-            
-            this._isLoading = true
-            this.showPlaceholder()
-            this.root.image.src = this._src
-            this.root.image.decode()
-                .then(this.loaded.bind(this))
-                .catch(this.failed.bind(this));
-            
-            console.debug('Loading image...',this.root)
-        }
-
         loaded(){
             if(!this.root.image.complete)
                 return
@@ -264,6 +251,25 @@ class ImgLazy extends HTMLElement{
     //#endregion
 
     //#region Methods
+
+        load(force = false){
+            // forcing means, don't care if it's lazy and it's not shown into the screen
+            // make the image not lazy and load it
+            if(force == true) this.readyToLoad = true
+
+            if(this._isLoaded || this._isLoading || !this._readyToLoad)
+                return 
+            
+            this._isLoading = true
+            this.showPlaceholder()
+            this.root.image.src = this._src
+            this.root.image.decode()
+                .then(this.loaded.bind(this))
+                .catch(this.failed.bind(this));
+            
+            console.debug('Loading image...',this.root)
+        }
+
     //#endregion
 }
 
