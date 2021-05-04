@@ -638,7 +638,7 @@ class Carousel extends HTMLElement{
             this.root.wrapper.appendChild( new ImgLazy(img) )
 
         this._nImg              = this.root.wrapper.childElementCount
-        this._imgList           = this.root.wrapper.children
+        this._imgList           = Array.from(this.root.wrapper.children)
 
         this.init()
     }
@@ -770,32 +770,7 @@ class CarouselPreview extends Carousel{
 
             
             let indexPreview = 1 
-            this._imgList.forEach(img=>{
-
-                let imgEl = img.cloneNode()
-                // imgEl.lazy = false
-                                
-                if(img instanceof ImgLazy) imgEl.size = 'cover'
-                
-                // imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
-                
-                imgEl.onload = debounce(function(){this.calculateSplitPreview()}.bind(this),500)
-                
-                imgEl.classList.add('preview')
-                
-
-                imgEl.addEventListener('click', function(el, index){
-                    // debugger
-                    this.index = index
-                    this.selectPreview(el)
-
-                }.bind(this, imgEl, indexPreview))
-
-                this.root.wrapperPreviews.appendChild(imgEl)
-                this._previewList.push(imgEl)
-                indexPreview++
-            })
-
+            if(this._nImg > 0) this._imgList.forEach(img=>{ this.addPreview( img, indexPreview++ ) })
                   
 
             this.root.footer.appendChild(this.root.wrapperPreviews)
@@ -968,6 +943,39 @@ class CarouselPreview extends Carousel{
         // if is set has at least one false, don't show previews
         if(!imgLoaded.has(false))
             setTimeout(calculate.bind(this), timer)
+    }
+
+    addPreview(img, indexPreview){
+        let imgEl = img.cloneNode()
+
+        if(img instanceof ImgLazy) imgEl.size = 'cover'
+        else imgEl.onload = debounce(function(){this.calculateSplitPreview()}.bind(this),500)
+        
+        imgEl.classList.add('preview')
+        
+
+        imgEl.addEventListener('click', function(el, index){
+            // debugger
+            this.index = index
+            this.selectPreview(el)
+
+        }.bind(this, imgEl, indexPreview))
+
+        this.root.wrapperPreviews.appendChild(imgEl)
+        this._previewList.push(imgEl)
+    }
+
+    addImage(img){
+        super.addImage(img)
+
+        if(this.root.wrapperPreviews == null) return
+
+        img = Array.from(this._imgList).slice([this._previewList.length])
+        let indexPreview = this._previewList.length+1
+        if(img instanceof Array) img.forEach(i=>{ this.addPreview( i, indexPreview++ ) })
+        else                     this.addPreview( img, indexPreview )
+
+        this.calculateSplitPreview(50)
     }
 
     //#endregion
