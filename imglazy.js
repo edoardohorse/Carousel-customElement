@@ -1,5 +1,7 @@
 'use strict';
 
+const CSS_IMGLAZY = 'imglazy.css'
+
 const OPTIONS_OBSERVER =  {
     root: null,
     rootMargin: '0px',
@@ -72,7 +74,7 @@ class ImgLazy extends HTMLElement{
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
-        this.root.style.setAttribute('href','img.css')
+        this.root.style.setAttribute('href', CSS_IMGLAZY)
         this.root.style.addEventListener('load', _=>{
             // when css is loaded and img-lazy is printed into the page with all calculations made
             // set that is ready to load. This means that from now it can be observed and load the

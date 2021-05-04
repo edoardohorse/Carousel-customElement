@@ -1,5 +1,8 @@
 'use strict';
 
+const CSS_CAROUSEL             = "carousel.css"
+const CSS_CAROUSEL_FULLSCREEN  = "carousel_fullscreen.css"
+
 const OPTIONS_OBSERVER_CAROUSEL =  {
     root: null,
     rootMargin: '0px',
@@ -13,6 +16,8 @@ const observerCarousel = new IntersectionObserver( function(entries, observerCar
         })
     }
     , OPTIONS_OBSERVER_CAROUSEL);
+
+
 
 class Carousel extends HTMLElement{
 
@@ -145,13 +150,13 @@ class Carousel extends HTMLElement{
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
-        this.root.style.setAttribute('href','carousel.css')
+        this.root.style.setAttribute('href', CSS_CAROUSEL)
         this.root.style.addEventListener('load', _=>{
             if(this._timer) observerCarousel.observe(this)
         })
 
         this.root.styleFullscreen.setAttribute('rel','stylesheet')
-        this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
+        this.root.styleFullscreen.setAttribute('href',CSS_CAROUSEL_FULLSCREEN)
         this.root.styleFullscreen.disabled = true
 
         this.root.appendChild(this.root.style)
