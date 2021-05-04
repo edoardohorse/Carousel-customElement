@@ -665,27 +665,14 @@ class CarouselDotted extends Carousel{
         this._dotList = []
         this._dotSelected = undefined
 
-        let wrapperDot = document.createElement('div')
+        this.root.wrapperDot = document.createElement('div')
         
-        let indexDot = 1 
-        this._imgList.forEach(img=>{
-
-            let dot = document.createElement('ol')        
-            dot.addEventListener('click', function(ol, index){
-                // debugger
-                this.index = index
-                this.selectDot(ol)
-
-            }.bind(this, dot, indexDot))
-
-            wrapperDot.appendChild(dot)
-            this._dotList.push(dot)
-            indexDot++
-        })
-
+        let indexDot = 1
+        if(this._nImg > 0) this._imgList.forEach(img=>{ this.addDot( indexDot++ ) })
+        
         this.root.footer.classList.add('extendable')
         
-        this.root.footer.appendChild(wrapperDot)
+        this.root.footer.appendChild(this.root.wrapperDot)
     }
 
 
@@ -709,6 +696,29 @@ class CarouselDotted extends Carousel{
 
     }
 
+    addDot(indexDot){
+        let dot = document.createElement('ol')        
+        dot.addEventListener('click', function(ol, index){
+            // debugger
+            this.index = index
+            this.selectDot(ol)
+
+        }.bind(this, dot, indexDot))
+
+        this.root.wrapperDot.appendChild(dot)
+        this._dotList.push(dot)
+    }
+
+    addImage(img){
+        super.addImage(img)
+
+        if(this.root.wrapperDot == null) return
+
+        let indexDot = this._dotList.length+1
+        if(img instanceof Array) img.forEach(_=>{ this.addDot( indexDot++ ) })
+        else                     this.addDot( indexDot )
+        
+    }
     //#endregion
 
 }
