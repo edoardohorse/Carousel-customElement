@@ -1,4 +1,7 @@
 'use strict';
+
+const CSS_PLACEHOLDER = 'placeholder.css'
+
 class Placeholder extends HTMLElement{
 
     static get observedAttributes(){
@@ -26,7 +29,7 @@ class Placeholder extends HTMLElement{
 
          //style
         this.root.style.setAttribute('rel','stylesheet')
-        this.root.style.setAttribute('href','placeholder.css')
+        this.root.style.setAttribute('href', CSS_PLACEHOLDER)
 
         this.root.appendChild(this.root.style)
         

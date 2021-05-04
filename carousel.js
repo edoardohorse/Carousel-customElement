@@ -1,5 +1,8 @@
 'use strict';
 
+const CSS_CAROUSEL             = "carousel.css"
+const CSS_CAROUSEL_FULLSCREEN  = "carousel_fullscreen.css"
+
 const OPTIONS_OBSERVER_CAROUSEL =  {
     root: null,
     rootMargin: '0px',
@@ -13,6 +16,8 @@ const observerCarousel = new IntersectionObserver( function(entries, observerCar
         })
     }
     , OPTIONS_OBSERVER_CAROUSEL);
+
+
 
 class Carousel extends HTMLElement{
 
@@ -145,13 +150,13 @@ class Carousel extends HTMLElement{
 
         //style
         this.root.style.setAttribute('rel','stylesheet')
-        this.root.style.setAttribute('href','carousel.css')
+        this.root.style.setAttribute('href', CSS_CAROUSEL)
         this.root.style.addEventListener('load', _=>{
             if(this._timer) observerCarousel.observe(this)
         })
 
         this.root.styleFullscreen.setAttribute('rel','stylesheet')
-        this.root.styleFullscreen.setAttribute('href','carousel_fullscreen.css')
+        this.root.styleFullscreen.setAttribute('href',CSS_CAROUSEL_FULLSCREEN)
         this.root.styleFullscreen.disabled = true
 
         this.root.appendChild(this.root.style)
@@ -177,27 +182,19 @@ class Carousel extends HTMLElement{
         this.root.aside.appendChild(this.root.btnNext)
 
         // footer
-        
-
-        //images
-        let imgs = this.querySelectorAll('img-lazy, img')
-        
-        imgs.forEach(img=>{
-            
-            if(img instanceof ImgLazy) return this.root.wrapper.appendChild(img)
-
-            let el = document.createElement('div')
-            el.setAttribute('data-src', img.src.replace(location.href, "./"))                
-            
-            el.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
-            this.root.wrapper.appendChild(el)
-            
-            this.removeChild(img)
-        })
-
 
         //progression
         this.root.progression     = document.createElement('span')
+
+        //images
+        let imgs = Array.from(this.querySelectorAll('img-lazy, img'))
+        
+        if(imgs.length > 0)
+            imgs.forEach(img=>{ this.addImage( img ) })
+        
+
+
+        
         
 
         
@@ -324,15 +321,7 @@ class Carousel extends HTMLElement{
     }
 
     connectedCallback(){
-        if(this._nImg == 1){
-            this.disableBtnNext()
-            this.disableBtnPrev()
-        }
-
-        if(!this._isLooped)
-            this.disableBtnPrev()
-
-        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+        this.init()
 
         this._defaultSizeImg = this.sizeImg
 
@@ -469,6 +458,19 @@ class Carousel extends HTMLElement{
 
     //#region Private
     
+
+    init(){
+        if(this._nImg == 1){
+            this.disableBtnNext()
+            this.disableBtnPrev()
+        }
+
+        if(!this._isLooped)
+            this.disableBtnPrev()
+
+        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+    }
+
     addEventListener(){
 
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
@@ -612,6 +614,35 @@ class Carousel extends HTMLElement{
     togglePlayback(){
         this._isPausedTimer? this.play(): this.pause(); 
     }
+
+    addImage(img){
+
+        if(img instanceof ImgLazy) this.root.wrapper.appendChild(img)
+
+        else if(img instanceof HTMLImageElement){
+            let el = document.createElement('div')
+            el.setAttribute('data-src', img.src.replace(location.href, "./"))                
+            
+            el.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+            this.root.wrapper.appendChild(el)
+            
+            this.removeChild(img)
+
+            return
+        }
+            // if img is an array of URLs
+        else if(img instanceof Array) img.forEach(i=>{ this.root.wrapper.appendChild( new ImgLazy(i) ) })
+        
+        else
+            // if img is an URL
+            this.root.wrapper.appendChild( new ImgLazy(img) )
+
+        this._nImg              = this.root.wrapper.childElementCount
+        this._imgList           = Array.from(this.root.wrapper.children)
+
+        this.init()
+    }
+
     //#endregion
 }
 
@@ -634,27 +665,14 @@ class CarouselDotted extends Carousel{
         this._dotList = []
         this._dotSelected = undefined
 
-        let wrapperDot = document.createElement('div')
+        this.root.wrapperDot = document.createElement('div')
         
-        let indexDot = 1 
-        this._imgList.forEach(img=>{
-
-            let dot = document.createElement('ol')        
-            dot.addEventListener('click', function(ol, index){
-                // debugger
-                this.index = index
-                this.selectDot(ol)
-
-            }.bind(this, dot, indexDot))
-
-            wrapperDot.appendChild(dot)
-            this._dotList.push(dot)
-            indexDot++
-        })
-
+        let indexDot = 1
+        if(this._nImg > 0) this._imgList.forEach(img=>{ this.addDot( indexDot++ ) })
+        
         this.root.footer.classList.add('extendable')
         
-        this.root.footer.appendChild(wrapperDot)
+        this.root.footer.appendChild(this.root.wrapperDot)
     }
 
 
@@ -678,6 +696,29 @@ class CarouselDotted extends Carousel{
 
     }
 
+    addDot(indexDot){
+        let dot = document.createElement('ol')        
+        dot.addEventListener('click', function(ol, index){
+            // debugger
+            this.index = index
+            this.selectDot(ol)
+
+        }.bind(this, dot, indexDot))
+
+        this.root.wrapperDot.appendChild(dot)
+        this._dotList.push(dot)
+    }
+
+    addImage(img){
+        super.addImage(img)
+
+        if(this.root.wrapperDot == null) return
+
+        let indexDot = this._dotList.length+1
+        if(img instanceof Array) img.forEach(_=>{ this.addDot( indexDot++ ) })
+        else                     this.addDot( indexDot )
+        
+    }
     //#endregion
 
 }
@@ -729,32 +770,7 @@ class CarouselPreview extends Carousel{
 
             
             let indexPreview = 1 
-            this._imgList.forEach(img=>{
-
-                let imgEl = img.cloneNode()
-                // imgEl.lazy = false
-                                
-                if(img instanceof ImgLazy) imgEl.size = 'cover'
-                
-                // imgEl.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
-                
-                imgEl.onload = debounce(function(){this.calculateSplitPreview()}.bind(this),500)
-                
-                imgEl.classList.add('preview')
-                
-
-                imgEl.addEventListener('click', function(el, index){
-                    // debugger
-                    this.index = index
-                    this.selectPreview(el)
-
-                }.bind(this, imgEl, indexPreview))
-
-                this.root.wrapperPreviews.appendChild(imgEl)
-                this._previewList.push(imgEl)
-                indexPreview++
-            })
-
+            if(this._nImg > 0) this._imgList.forEach(img=>{ this.addPreview( img, indexPreview++ ) })
                   
 
             this.root.footer.appendChild(this.root.wrapperPreviews)
@@ -927,6 +943,39 @@ class CarouselPreview extends Carousel{
         // if is set has at least one false, don't show previews
         if(!imgLoaded.has(false))
             setTimeout(calculate.bind(this), timer)
+    }
+
+    addPreview(img, indexPreview){
+        let imgEl = img.cloneNode()
+
+        if(img instanceof ImgLazy) imgEl.size = 'cover'
+        else imgEl.onload = debounce(function(){this.calculateSplitPreview()}.bind(this),500)
+        
+        imgEl.classList.add('preview')
+        
+
+        imgEl.addEventListener('click', function(el, index){
+            // debugger
+            this.index = index
+            this.selectPreview(el)
+
+        }.bind(this, imgEl, indexPreview))
+
+        this.root.wrapperPreviews.appendChild(imgEl)
+        this._previewList.push(imgEl)
+    }
+
+    addImage(img){
+        super.addImage(img)
+
+        if(this.root.wrapperPreviews == null) return
+
+        img = Array.from(this._imgList).slice([this._previewList.length])
+        let indexPreview = this._previewList.length+1
+        if(img instanceof Array) img.forEach(i=>{ this.addPreview( i, indexPreview++ ) })
+        else                     this.addPreview( img, indexPreview )
+
+        this.calculateSplitPreview(50)
     }
 
     //#endregion
