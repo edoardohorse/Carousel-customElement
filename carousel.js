@@ -182,27 +182,19 @@ class Carousel extends HTMLElement{
         this.root.aside.appendChild(this.root.btnNext)
 
         // footer
-        
-
-        //images
-        let imgs = this.querySelectorAll('img-lazy, img')
-        
-        imgs.forEach(img=>{
-            
-            if(img instanceof ImgLazy) return this.root.wrapper.appendChild(img)
-
-            let el = document.createElement('div')
-            el.setAttribute('data-src', img.src.replace(location.href, "./"))                
-            
-            el.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
-            this.root.wrapper.appendChild(el)
-            
-            this.removeChild(img)
-        })
-
 
         //progression
         this.root.progression     = document.createElement('span')
+
+        //images
+        let imgs = Array.from(this.querySelectorAll('img-lazy, img'))
+        
+        if(imgs.length > 0)
+            imgs.forEach(img=>{ this.addImage( img ) })
+        
+
+
+        
         
 
         
@@ -329,15 +321,7 @@ class Carousel extends HTMLElement{
     }
 
     connectedCallback(){
-        if(this._nImg == 1){
-            this.disableBtnNext()
-            this.disableBtnPrev()
-        }
-
-        if(!this._isLooped)
-            this.disableBtnPrev()
-
-        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+        this.init()
 
         this._defaultSizeImg = this.sizeImg
 
@@ -474,6 +458,19 @@ class Carousel extends HTMLElement{
 
     //#region Private
     
+
+    init(){
+        if(this._nImg == 1){
+            this.disableBtnNext()
+            this.disableBtnPrev()
+        }
+
+        if(!this._isLooped)
+            this.disableBtnPrev()
+
+        this.root.progression.textContent = `${this._index+1}/${this._nImg}`
+    }
+
     addEventListener(){
 
         this.root.btnNext.addEventListener('click', this.goNext.bind(this), false)
@@ -617,6 +614,35 @@ class Carousel extends HTMLElement{
     togglePlayback(){
         this._isPausedTimer? this.play(): this.pause(); 
     }
+
+    addImage(img){
+
+        if(img instanceof ImgLazy) this.root.wrapper.appendChild(img)
+
+        else if(img instanceof HTMLImageElement){
+            let el = document.createElement('div')
+            el.setAttribute('data-src', img.src.replace(location.href, "./"))                
+            
+            el.style.backgroundImage = `url(${img.src.replace(location.href, "./")})`
+            this.root.wrapper.appendChild(el)
+            
+            this.removeChild(img)
+
+            return
+        }
+            // if img is an array of URLs
+        else if(img instanceof Array) img.forEach(i=>{ this.root.wrapper.appendChild( new ImgLazy(i) ) })
+        
+        else
+            // if img is an URL
+            this.root.wrapper.appendChild( new ImgLazy(img) )
+
+        this._nImg              = this.root.wrapper.childElementCount
+        this._imgList           = this.root.wrapper.children
+
+        this.init()
+    }
+
     //#endregion
 }
 
